@@ -13,30 +13,47 @@
   --danger: #ef8a7a;
   --line: rgba(255, 255, 255, 0.14);
   --line-soft: rgba(255, 255, 255, 0.07);
+
+  /* Cuadrícula responsiva */
+  --grid-size: clamp(24px, 2vw, 32px);
+
   --radius: 3px;
-  --grid-size: 28px;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html,
-body {
-  padding: 0;
+html {
+  width: 100%;
+  min-height: 100%;
   margin: 0;
+  padding: 0;
   background: var(--bg);
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+
+  background-color: var(--bg);
+
+  /* Cuadrícula que se repite infinitamente */
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+
+  background-size: var(--grid-size) var(--grid-size);
+  background-position: 0 0;
+  background-repeat: repeat;
+  background-attachment: fixed;
+
   color: var(--ink);
   font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.55;
-}
-
-body {
-  background-image: linear-gradient(var(--line-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
-  background-size: var(--grid-size) var(--grid-size);
-  background-attachment: fixed;
 }
 
 h1,
@@ -77,18 +94,21 @@ button {
 /* --- Layout --- */
 
 .page {
+  width: 100%;
   max-width: 720px;
   margin: 0 auto;
   padding: 0 24px 96px;
 }
 
 .letterhead {
+  width: 100%;
   border-bottom: 1px solid var(--line);
   padding: 20px 24px;
   margin-bottom: 8px;
 }
 
 .letterhead-inner {
+  width: 100%;
   max-width: 720px;
   margin: 0 auto;
   display: flex;
@@ -177,19 +197,13 @@ button {
   max-width: 46ch;
 }
 
-/* --- Tarjetas de herramientas (home) --- */
+/* --- Tarjetas de herramientas --- */
 
 .tool-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-top: 32px;
-}
-
-@media (max-width: 560px) {
-  .tool-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .tool-card {
@@ -246,10 +260,11 @@ button {
   color: var(--teal);
 }
 
-/* --- Zona de carga (dropzone) con marcas de registro --- */
+/* --- Zona de carga --- */
 
 .dropzone {
   position: relative;
+  width: 100%;
   border: 1px dashed var(--line);
   border-radius: var(--radius);
   padding: 48px 20px;
@@ -301,14 +316,17 @@ button {
   top: 8px;
   left: 8px;
 }
+
 .crosshair-tr {
   top: 8px;
   right: 8px;
 }
+
 .crosshair-bl {
   bottom: 8px;
   left: 8px;
 }
+
 .crosshair-br {
   bottom: 8px;
   right: 8px;
@@ -347,6 +365,7 @@ button {
 
 .file-name {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -471,6 +490,7 @@ button {
 
 .image-card img {
   width: 100%;
+  height: auto;
   display: block;
 }
 
@@ -489,6 +509,66 @@ button {
 .image-card button:hover:not(:disabled) {
   color: var(--teal);
 }
+
+/* --- Pantallas grandes --- */
+
+@media (min-width: 1200px) {
+  :root {
+    --grid-size: 30px;
+  }
+
+  .page,
+  .letterhead-inner {
+    max-width: 900px;
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --grid-size: 32px;
+  }
+
+  .page,
+  .letterhead-inner {
+    max-width: 1100px;
+  }
+}
+
+/* --- Tablets y móviles --- */
+
+@media (max-width: 560px) {
+  .page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .letterhead {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .letterhead-inner {
+    gap: 12px;
+  }
+
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet-header {
+    flex-direction: column;
+  }
+
+  .sheet-title {
+    font-size: 24px;
+  }
+
+  .dropzone {
+    padding: 40px 16px;
+  }
+}
+
+/* --- Accesibilidad --- */
 
 @media (prefers-reduced-motion: reduce) {
   * {
