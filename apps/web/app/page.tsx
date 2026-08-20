@@ -6,7 +6,7 @@ const ROUTES: Partial<Record<ConversionType, string>> = {
   // Las demás herramientas se activan conforme se implementen:
   "compress-pdf": "/comprimir-pdf",
   "pdf-to-images": "/pdf-a-imagenes",
-  // "images-to-pdf": "/imagenes-a-pdf",
+  "images-to-pdf": "/imagenes-a-pdf",
 };
 
 export default function HomePage() {
