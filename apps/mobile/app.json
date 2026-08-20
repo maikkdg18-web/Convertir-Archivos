@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Conversor de Archivos",
+    "slug": "conversor-archivos",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "android": {
+      "package": "com.maiky.conversorarchivos"
+    },
+    "ios": {
+      "bundleIdentifier": "com.maiky.conversorarchivos"
+    }
+  }
+}

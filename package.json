@@ -1,0 +1,17 @@
+{
+  "name": "conversor-app",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:mobile": "npm run start --workspace=apps/mobile",
+    "supabase:start": "supabase start",
+    "supabase:deploy": "supabase functions deploy"
+  },
+  "devDependencies": {
+    "supabase": "^1.200.3"
+  }
+}
