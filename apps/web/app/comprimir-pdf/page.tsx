@@ -97,69 +97,55 @@ export default function ComprimirPdfPage() {
   }
 
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: 600 }}>
-      <a href="/" style={{ color: "#2563eb" }}>
-        ← Volver
-      </a>
-      <h1>Comprimir PDF</h1>
-      <p>Sube un PDF y reducimos su peso optimizando su estructura interna.</p>
+    <main className="page">
+      <a href="/" className="back-link">← volver al set</a>
+
+      <div className="sheet-header">
+        <div>
+          <h1 className="sheet-title">Comprimir PDF</h1>
+          <p className="sheet-desc">
+            Sube un PDF y reducimos su peso optimizando su estructura interna.
+          </p>
+        </div>
+        <span className="sheet-number">HOJA 02</span>
+      </div>
 
       <FileDropzone accept="application/pdf" multiple={false} onFilesSelected={handleFilesSelected} />
 
       {file && (
-        <p style={{ marginTop: "1rem" }}>
-          Archivo seleccionado: <strong>{file.name}</strong> ({formatBytes(file.size)})
+        <p className="mono muted" style={{ marginTop: 14, fontSize: 13 }}>
+          {file.name} · {formatBytes(file.size)}
         </p>
       )}
 
-      <button
-        onClick={handleCompress}
-        disabled={status === "uploading" || status === "processing"}
-        style={{
-          marginTop: "1.5rem",
-          padding: "0.75rem 1.5rem",
-          backgroundColor: "#2563eb",
-          color: "white",
-          border: "none",
-          borderRadius: 6,
-          cursor: "pointer",
-          opacity: status === "uploading" || status === "processing" ? 0.6 : 1,
-        }}
-      >
-        {status === "uploading" && "Subiendo archivo..."}
-        {status === "processing" && "Comprimiendo..."}
-        {(status === "idle" || status === "done" || status === "error") && "Comprimir PDF"}
-      </button>
+      <div style={{ marginTop: 24 }}>
+        <button
+          onClick={handleCompress}
+          disabled={status === "uploading" || status === "processing"}
+          className="btn btn-primary"
+        >
+          {status === "uploading" && "subiendo archivo…"}
+          {status === "processing" && "comprimiendo…"}
+          {(status === "idle" || status === "done" || status === "error") && "comprimir pdf →"}
+        </button>
+      </div>
 
-      {errorMsg && <p style={{ color: "red", marginTop: "1rem" }}>{errorMsg}</p>}
+      {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
 
       {status === "done" && result && (
-        <div style={{ marginTop: "1.5rem", padding: "1rem", backgroundColor: "#f0fdf4", borderRadius: 8 }}>
-          <p style={{ margin: 0, marginBottom: 4 }}>✅ ¡Listo!</p>
-          <p style={{ margin: 0, marginBottom: 4, fontSize: 14, color: "#555" }}>
+        <div className="result-panel">
+          <span className="stamp">✓ listo</span>
+          <p className="result-meta">
             {formatBytes(result.originalSize)} → {formatBytes(result.compressedSize)}
-            {result.savedPercent > 0 && ` (−${result.savedPercent}%)`}
+            {result.savedPercent > 0 && ` · −${result.savedPercent}%`}
           </p>
           {result.savedPercent === 0 && (
-            <p style={{ margin: 0, marginBottom: 8, fontSize: 13, color: "#888" }}>
+            <p className="muted" style={{ fontSize: 13, marginTop: -6, marginBottom: 12 }}>
               Este PDF ya estaba bien optimizado, no hubo mucho que reducir.
             </p>
           )}
-          <button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            style={{
-              marginTop: 8,
-              padding: "0.5rem 1rem",
-              backgroundColor: "#16a34a",
-              color: "white",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer",
-              opacity: isDownloading ? 0.6 : 1,
-            }}
-          >
-            {isDownloading ? "Descargando..." : "Descargar PDF"}
+          <button onClick={handleDownload} disabled={isDownloading} className="btn btn-success">
+            {isDownloading ? "descargando…" : "descargar pdf"}
           </button>
         </div>
       )}

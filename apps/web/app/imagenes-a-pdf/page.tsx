@@ -97,66 +97,55 @@ export default function ImagenesAPdfPage() {
   }
 
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: 600 }}>
-      <a href="/" style={{ color: "#2563eb" }}>
-        ← Volver
-      </a>
-      <h1>Imágenes a PDF</h1>
-      <p>Sube una o varias imágenes (JPG o PNG) y las juntamos en un solo PDF, en el orden en que las agregues.</p>
+    <main className="page">
+      <a href="/" className="back-link">← volver al set</a>
+
+      <div className="sheet-header">
+        <div>
+          <h1 className="sheet-title">Imágenes a PDF</h1>
+          <p className="sheet-desc">
+            Sube una o varias imágenes (JPG o PNG) y las juntamos en un PDF, en orden.
+          </p>
+        </div>
+        <span className="sheet-number">HOJA 04</span>
+      </div>
 
       <FileDropzone accept="image/png, image/jpeg" onFilesSelected={handleFilesSelected} />
 
       {images.length > 0 && (
-        <ul style={{ marginTop: "1rem", paddingLeft: "1rem" }}>
+        <ul className="file-list">
           {images.map((img, i) => (
-            <li key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-              <span>{img.name}</span>
-              <button onClick={() => removeImage(i)} style={{ marginLeft: 8, cursor: "pointer" }}>
-                Quitar
+            <li key={i} className="file-row">
+              <span className="file-index">{String(i + 1).padStart(2, "0")}</span>
+              <span className="file-name">{img.name}</span>
+              <button onClick={() => removeImage(i)} className="file-remove">
+                quitar
               </button>
             </li>
           ))}
         </ul>
       )}
 
-      <button
-        onClick={handleConvert}
-        disabled={status === "uploading" || status === "processing"}
-        style={{
-          marginTop: "1.5rem",
-          padding: "0.75rem 1.5rem",
-          backgroundColor: "#2563eb",
-          color: "white",
-          border: "none",
-          borderRadius: 6,
-          cursor: "pointer",
-          opacity: status === "uploading" || status === "processing" ? 0.6 : 1,
-        }}
-      >
-        {status === "uploading" && "Subiendo imágenes..."}
-        {status === "processing" && "Creando PDF..."}
-        {(status === "idle" || status === "done" || status === "error") && "Convertir a PDF"}
-      </button>
+      <div style={{ marginTop: 24 }}>
+        <button
+          onClick={handleConvert}
+          disabled={status === "uploading" || status === "processing"}
+          className="btn btn-primary"
+        >
+          {status === "uploading" && "subiendo imágenes…"}
+          {status === "processing" && "creando pdf…"}
+          {(status === "idle" || status === "done" || status === "error") && "convertir a pdf →"}
+        </button>
+      </div>
 
-      {errorMsg && <p style={{ color: "red", marginTop: "1rem" }}>{errorMsg}</p>}
+      {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
 
       {status === "done" && resultUrl && (
-        <div style={{ marginTop: "1.5rem", padding: "1rem", backgroundColor: "#f0fdf4", borderRadius: 8 }}>
-          <p style={{ margin: 0, marginBottom: 8 }}>✅ ¡Listo! Tu PDF está creado.</p>
-          <button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            style={{
-              padding: "0.5rem 1rem",
-              backgroundColor: "#16a34a",
-              color: "white",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer",
-              opacity: isDownloading ? 0.6 : 1,
-            }}
-          >
-            {isDownloading ? "Descargando..." : "Descargar PDF"}
+        <div className="result-panel">
+          <span className="stamp">✓ listo</span>
+          <p className="result-meta">Tu PDF quedó creado y listo para descargar.</p>
+          <button onClick={handleDownload} disabled={isDownloading} className="btn btn-success">
+            {isDownloading ? "descargando…" : "descargar pdf"}
           </button>
         </div>
       )}

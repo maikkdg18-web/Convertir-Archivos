@@ -86,86 +86,62 @@ export default function PdfAImagenesPage() {
   async function handleDownloadAll() {
     for (let i = 0; i < images.length; i++) {
       await handleDownload(images[i], i);
-      // pequeña pausa para que el navegador no bloquee descargas múltiples seguidas
       await new Promise((r) => setTimeout(r, 300));
     }
   }
 
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: 700 }}>
-      <a href="/" style={{ color: "#2563eb" }}>
-        ← Volver
-      </a>
-      <h1>PDF a imágenes</h1>
-      <p>Sube un PDF y convertimos cada página en una imagen PNG.</p>
+    <main className="page">
+      <a href="/" className="back-link">← volver al set</a>
+
+      <div className="sheet-header">
+        <div>
+          <h1 className="sheet-title">PDF a imágenes</h1>
+          <p className="sheet-desc">
+            Sube un PDF y convertimos cada página en una imagen PNG.
+          </p>
+        </div>
+        <span className="sheet-number">HOJA 03</span>
+      </div>
 
       <FileDropzone accept="application/pdf" multiple={false} onFilesSelected={handleFilesSelected} />
 
       {file && (
-        <p style={{ marginTop: "1rem" }}>
-          Archivo seleccionado: <strong>{file.name}</strong>
+        <p className="mono muted" style={{ marginTop: 14, fontSize: 13 }}>
+          {file.name}
         </p>
       )}
 
-      <button
-        onClick={handleConvert}
-        disabled={status === "uploading" || status === "processing"}
-        style={{
-          marginTop: "1.5rem",
-          padding: "0.75rem 1.5rem",
-          backgroundColor: "#2563eb",
-          color: "white",
-          border: "none",
-          borderRadius: 6,
-          cursor: "pointer",
-          opacity: status === "uploading" || status === "processing" ? 0.6 : 1,
-        }}
-      >
-        {status === "uploading" && "Subiendo archivo..."}
-        {status === "processing" && "Convirtiendo páginas..."}
-        {(status === "idle" || status === "done" || status === "error") && "Convertir a imágenes"}
-      </button>
+      <div style={{ marginTop: 24 }}>
+        <button
+          onClick={handleConvert}
+          disabled={status === "uploading" || status === "processing"}
+          className="btn btn-primary"
+        >
+          {status === "uploading" && "subiendo archivo…"}
+          {status === "processing" && "convirtiendo páginas…"}
+          {(status === "idle" || status === "done" || status === "error") && "convertir a imágenes →"}
+        </button>
+      </div>
 
-      {errorMsg && <p style={{ color: "red", marginTop: "1rem" }}>{errorMsg}</p>}
+      {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
 
       {status === "done" && images.length > 0 && (
-        <div style={{ marginTop: "1.5rem" }}>
+        <div style={{ marginTop: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <p style={{ margin: 0 }}>✅ {images.length} página(s) convertidas</p>
-            <button
-              onClick={handleDownloadAll}
-              style={{
-                padding: "0.5rem 1rem",
-                backgroundColor: "#16a34a",
-                color: "white",
-                border: "none",
-                borderRadius: 6,
-                cursor: "pointer",
-              }}
-            >
-              Descargar todas
+            <span className="stamp" style={{ margin: 0 }}>✓ {images.length} páginas</span>
+            <button onClick={handleDownloadAll} className="btn btn-success" style={{ padding: "8px 14px", fontSize: 13 }}>
+              descargar todas
             </button>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12 }}>
+          <div className="image-grid">
             {images.map((url, i) => (
-              <div key={i} style={{ border: "1px solid #eee", borderRadius: 8, overflow: "hidden" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt={`Página ${i + 1}`} style={{ width: "100%", display: "block" }} />
-                <button
-                  onClick={() => handleDownload(url, i)}
-                  disabled={downloadingIndex === i}
-                  style={{
-                    width: "100%",
-                    padding: "0.4rem",
-                    fontSize: 13,
-                    border: "none",
-                    borderTop: "1px solid #eee",
-                    backgroundColor: "#fafafa",
-                    cursor: "pointer",
-                  }}
-                >
-                  {downloadingIndex === i ? "Descargando..." : `Página ${i + 1}`}
+              // eslint-disable-next-line @next/next/no-img-element
+              <div key={i} className="image-card">
+                <img src={url} alt={`Página ${i + 1}`} />
+                <button onClick={() => handleDownload(url, i)} disabled={downloadingIndex === i}>
+                  {downloadingIndex === i ? "descargando…" : `página ${i + 1}`}
                 </button>
               </div>
             ))}

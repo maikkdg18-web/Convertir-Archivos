@@ -31,24 +31,29 @@ export function FileDropzone({ accept, multiple = true, onFilesSelected }: FileD
 
   return (
     <div
+      className="dropzone"
+      data-active={isDragging}
       onDragOver={(e) => {
         e.preventDefault();
         setIsDragging(true);
       }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
-      style={{
-        border: `2px dashed ${isDragging ? "#2563eb" : "#ccc"}`,
-        borderRadius: 8,
-        padding: "3rem 1.5rem",
-        textAlign: "center",
-        backgroundColor: isDragging ? "#eff6ff" : "#fafafa",
-        cursor: "pointer",
-      }}
       onClick={() => document.getElementById("file-input")?.click()}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          document.getElementById("file-input")?.click();
+        }
+      }}
     >
-      <p style={{ margin: 0, color: "#555" }}>
-        Arrastra tus archivos aquí o haz click para seleccionarlos
+      <span className="crosshair crosshair-tl" />
+      <span className="crosshair crosshair-tr" />
+      <span className="crosshair crosshair-bl" />
+      <span className="crosshair crosshair-br" />
+      <p className="dropzone-hint mono">
+        arrastra tus archivos aquí — o haz click para elegirlos
       </p>
       <input
         id="file-input"

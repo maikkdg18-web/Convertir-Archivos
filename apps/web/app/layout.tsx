@@ -1,6 +1,8 @@
+import "./globals.css";
+
 export const metadata = {
   title: "Conversor de Archivos",
-  description: "Convierte y manipula tus PDFs e imágenes gratis",
+  description: "Convierte y ajusta tus PDFs e imágenes",
 };
 
 export default function RootLayout({
@@ -10,7 +12,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <header className="letterhead">
+          <div className="letterhead-inner">
+            <span className="wordmark">
+              conversor<span>.</span>de-archivos
+            </span>
+            <span className="status-dot">listo para usar</span>
+          </div>
+        </header>
+        {children}
+      </body>
     </html>
   );
 }
