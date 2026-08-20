@@ -1,18 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
 :root {
-  --bg: #0f2942;
-  --surface: #143654;
-  --surface-raised: #173d5e;
-  --ink: #f2f7fb;
-  --ink-soft: #9db4c9;
-  --ink-faint: #6f8aa1;
-  --accent: #f2a93b;
-  --accent-ink: #12263a;
-  --teal: #7fd1d9;
-  --danger: #ef8a7a;
-  --line: rgba(255, 255, 255, 0.14);
-  --line-soft: rgba(255, 255, 255, 0.07);
+  --bg: #f8f9ff;
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-raised: #ffffff;
+  --ink: #24214a;
+  --ink-soft: #68658a;
+  --ink-faint: #9693b2;
+  --accent: #635bdf;
+  --accent-strong: #4e7cf0;
+  --accent-ink: #ffffff;
+  --teal: #4e7cf0;
+  --danger: #d65d78;
+  --line: rgba(91, 83, 190, 0.18);
+  --line-soft: rgba(91, 83, 190, 0.09);
 
   /* Cuadrícula responsiva */
   --grid-size: clamp(24px, 2vw, 32px);
@@ -42,6 +43,8 @@ body {
 
   /* Cuadrícula que se repite infinitamente */
   background-image:
+    radial-gradient(circle at 12% 0%, rgba(133, 103, 232, 0.18), transparent 30%),
+    radial-gradient(circle at 92% 12%, rgba(78, 124, 240, 0.14), transparent 28%),
     linear-gradient(var(--line-soft) 1px, transparent 1px),
     linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
 
@@ -103,6 +106,8 @@ button {
 .letterhead {
   width: 100%;
   border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(12px);
   padding: 20px 24px;
   margin-bottom: 8px;
 }
@@ -124,7 +129,7 @@ button {
 }
 
 .wordmark span {
-  color: var(--accent);
+  color: var(--accent-strong);
 }
 
 .status-dot {
@@ -143,7 +148,7 @@ button {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--teal);
+  background: var(--accent-strong);
 }
 
 /* --- Botón "volver" --- */
@@ -210,6 +215,7 @@ button {
   position: relative;
   display: block;
   background: var(--surface);
+  box-shadow: 0 12px 30px rgba(81, 71, 177, 0.07);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 20px 18px 18px;
@@ -219,7 +225,8 @@ button {
 }
 
 .tool-card:hover {
-  border-color: var(--teal);
+  border-color: var(--accent);
+  box-shadow: 0 16px 36px rgba(81, 71, 177, 0.14);
   transform: translateY(-2px);
 }
 
@@ -271,6 +278,7 @@ button {
   text-align: center;
   cursor: pointer;
   background: var(--surface);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
@@ -411,8 +419,9 @@ button {
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: linear-gradient(110deg, var(--accent), var(--accent-strong));
   color: var(--accent-ink);
+  box-shadow: 0 8px 18px rgba(92, 90, 222, 0.22);
 }
 
 .btn-success {
