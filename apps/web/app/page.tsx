@@ -4,7 +4,7 @@ import { CONVERSION_LABELS, ConversionType } from "@conversor/shared";
 const ROUTES: Partial<Record<ConversionType, string>> = {
   "merge-pdf": "/unir-pdfs",
   // Las demás herramientas se activan conforme se implementen:
-  // "compress-pdf": "/comprimir-pdf",
+  "compress-pdf": "/comprimir-pdf",
   // "pdf-to-images": "/pdf-a-imagenes",
   // "images-to-pdf": "/imagenes-a-pdf",
 };
