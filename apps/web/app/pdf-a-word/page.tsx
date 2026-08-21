@@ -12,6 +12,7 @@ export default function PdfAWordPage() {
       outputName="documento-editable.docx"
       buttonLabel="convertir a word →"
       processingLabel="convirtiendo a word…"
+      usageNote="Plan gratuito: hasta 10 conversiones diarias. Los archivos deben pesar menos de 1 GB."
     />
   );
 }

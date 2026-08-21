@@ -14,6 +14,7 @@ interface SingleFileConverterProps {
   outputName: string;
   buttonLabel: string;
   processingLabel: string;
+  usageNote?: string;
 }
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
@@ -28,6 +29,7 @@ export function SingleFileConverter({
   outputName,
   buttonLabel,
   processingLabel,
+  usageNote,
 }: SingleFileConverterProps) {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -84,11 +86,21 @@ export function SingleFileConverter({
           if (errorBody?.error) functionMessage = errorBody.error;
         }
 
-        throw new Error(
-          functionMessage.includes("Failed to send a request")
-            ? "La función de conversión aún no está desplegada en Supabase."
-            : functionMessage
-        );
+        const normalizedMessage = functionMessage.toLowerCase();
+        if (normalizedMessage.includes("failed to send a request")) {
+          functionMessage = "La función de conversión aún no está desplegada en Supabase.";
+        } else if (
+          normalizedMessage.includes("credit") ||
+          normalizedMessage.includes("quota") ||
+          normalizedMessage.includes("limit") ||
+          normalizedMessage.includes("daily")
+        ) {
+          functionMessage = "Se alcanzó el límite diario de conversiones. Intenta de nuevo mañana.";
+        } else if (normalizedMessage.includes("unauthorized") || normalizedMessage.includes("api key")) {
+          functionMessage = "La clave de CloudConvert no es válida o fue revocada.";
+        }
+
+        throw new Error(functionMessage);
       }
       if (!data?.success) throw new Error(data?.error ?? "No se pudo convertir el archivo.");
 
@@ -154,6 +166,8 @@ export function SingleFileConverter({
           {(status === "idle" || status === "done" || status === "error") && buttonLabel}
         </button>
       </div>
+
+      {usageNote && <p className="conversion-note">{usageNote}</p>}
 
       {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
 

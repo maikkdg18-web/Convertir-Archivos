@@ -12,6 +12,7 @@ export default function WordAPdfPage() {
       outputName="documento-convertido.pdf"
       buttonLabel="convertir a pdf →"
       processingLabel="convirtiendo a pdf…"
+      usageNote="Plan gratuito: hasta 10 conversiones diarias. Los archivos deben pesar menos de 1 GB."
     />
   );
 }

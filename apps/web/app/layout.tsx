@@ -1,4 +1,5 @@
 import "./globals.css";
+import Link from "next/link";
 
 export const metadata = {
   title: "Conversor de Archivos",
@@ -18,12 +19,12 @@ export default function RootLayout({
       <body>
         <header className="letterhead">
           <div className="letterhead-inner">
-            <div className="brand-lockup">
+            <Link href="/" className="brand-lockup" aria-label="Ir a la página principal">
               <img className="brand-icon" src="/icon.png" alt="" />
               <span className="wordmark">
                 CONVERSOR<span>.</span>DE ARCHIVOS
               </span>
-            </div>
+            </Link>
             <span className="status-dot">listo para usar</span>
           </div>
         </header>
