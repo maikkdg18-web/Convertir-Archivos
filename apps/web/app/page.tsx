@@ -25,6 +25,18 @@ const TOOLS = [
     name: "Imágenes a PDF",
     route: "/imagenes-a-pdf",
   },
+  {
+    sheet: "05",
+    tag: "DOC/DOCX → PDF",
+    name: "Word a PDF",
+    route: "/word-a-pdf",
+  },
+  {
+    sheet: "06",
+    tag: "PDF → DOCX",
+    name: "PDF a Word",
+    route: "/pdf-a-word",
+  },
 ];
 
 export default function HomePage() {
@@ -75,7 +87,7 @@ export default function HomePage() {
             <span className="eyebrow">Tu caja de herramientas</span>
             <h2>Elige una acción y empieza.</h2>
           </div>
-          <p>Cuatro herramientas para resolver el trabajo cotidiano con tus archivos.</p>
+          <p>Seis herramientas para resolver el trabajo cotidiano con tus archivos.</p>
         </div>
 
         <div className="landing-tool-grid">

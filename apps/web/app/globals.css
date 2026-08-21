@@ -854,6 +854,8 @@ button {
 .tool-tone-2 { background: linear-gradient(145deg, #b857d8, #e878b6); }
 .tool-tone-3 { background: linear-gradient(145deg, #5d80ed, #8b68e8); }
 .tool-tone-4 { background: linear-gradient(145deg, #e86db6, #b55cdb); }
+.tool-tone-5 { background: linear-gradient(145deg, #755fe0, #b968e2); }
+.tool-tone-6 { background: linear-gradient(145deg, #4f83e8, #8b68e8); }
 
 .tool-number,
 .tool-symbol {

@@ -29,6 +29,8 @@ conversor-app/
 - [ ] Comprimir PDF
 - [ ] PDF → imágenes (JPG/PNG)
 - [ ] Imágenes → PDF
+- [ ] Word → PDF
+- [ ] PDF → Word
 
 ## Cómo correr el proyecto
 
@@ -65,8 +67,15 @@ npm run dev:mobile
 npm run supabase:deploy
 ```
 
+Para activar Word → PDF y PDF → Word, crea una cuenta en CloudConvert y configura su clave como secreto de Supabase:
+
+```bash
+npx supabase secrets set CLOUDCONVERT_API_KEY=tu_clave_de_cloudconvert
+```
+
+Después vuelve a desplegar las funciones. La clave solo se usa dentro de las Edge Functions y no se expone en la aplicación web.
+
 ## Roadmap futuro
 
-- Word/Excel → PDF (requiere backend con LibreOffice, fuera del alcance de Supabase Edge Functions)
 - Historial de conversiones por usuario (tabla en Postgres vía Supabase)
 - Límite de tamaño / cuenta gratuita vs premium
