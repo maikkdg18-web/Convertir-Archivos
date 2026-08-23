@@ -1,24 +1,28 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
 :root {
-  --bg: #f8f9ff;
-  --surface: rgba(255, 255, 255, 0.86);
-  --surface-raised: #ffffff;
-  --ink: #24214a;
-  --ink-soft: #68658a;
-  --ink-faint: #9693b2;
-  --accent: #635bdf;
-  --accent-strong: #4e7cf0;
+  /* Variables de Cristal (Glassmorphism) */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-surface: rgba(255, 255, 255, 0.12);
+  --glass-raised: rgba(255, 255, 255, 0.18);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+
+  /* Colores adaptados para contraste sobre fondo oscuro */
+  --ink: #ffffff;
+  --ink-soft: #e2e8f0;
+  --ink-faint: #cbd5e1;
+  --accent: #a78bfa; 
+  --accent-strong: #c084fc;
   --accent-ink: #ffffff;
-  --teal: #4e7cf0;
-  --danger: #d65d78;
-  --line: rgba(91, 83, 190, 0.18);
-  --line-soft: rgba(91, 83, 190, 0.09);
+  --teal: #5eead4;
+  --danger: #fda4af;
+  --line: var(--glass-border);
+  --line-soft: rgba(255, 255, 255, 0.1);
 
   /* Cuadrícula responsiva */
   --grid-size: clamp(24px, 2vw, 32px);
-
-  --radius: 3px;
+  --radius: 16px; /* Bordes un poco más redondeados para que el cristal luzca mejor */
 }
 
 * {
@@ -30,7 +34,6 @@ html {
   min-height: 100%;
   margin: 0;
   padding: 0;
-  background: var(--bg);
 }
 
 body {
@@ -39,24 +42,22 @@ body {
   margin: 0;
   padding: 0;
 
-  background-color: var(--bg);
-
-  /* Cuadrícula que se repite infinitamente */
-  background-image:
-    radial-gradient(circle at 12% 0%, rgba(133, 103, 232, 0.18), transparent 30%),
-    radial-gradient(circle at 92% 12%, rgba(78, 124, 240, 0.14), transparent 28%),
-    linear-gradient(var(--line-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
-
-  background-size: auto, auto, var(--grid-size) var(--grid-size), var(--grid-size) var(--grid-size);
-  background-position: 0 0;
-  background-repeat: no-repeat, no-repeat, repeat, repeat;
+  /* Fondo degradado animado */
+  background: linear-gradient(-45deg, #0f172a, #3b0764, #0f2942, #1e293b);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   background-attachment: fixed;
 
   color: var(--ink);
   font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.55;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 h1,
@@ -106,8 +107,9 @@ button {
 .letterhead {
   width: 100%;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.58);
-  backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 20px 24px;
   margin-bottom: 8px;
 }
@@ -137,7 +139,7 @@ button {
   object-fit: cover;
   object-position: center;
   flex: 0 0 30px;
-  box-shadow: 0 5px 12px rgba(78, 124, 240, 0.2);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
 }
 
 .wordmark {
@@ -148,7 +150,7 @@ button {
 }
 
 .wordmark span {
-  color: var(--accent-strong);
+  color: var(--teal);
 }
 
 .status-dot {
@@ -167,7 +169,8 @@ button {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent-strong);
+  background: var(--teal);
+  box-shadow: 0 0 8px var(--teal);
 }
 
 /* --- Botón "volver" --- */
@@ -204,7 +207,7 @@ button {
 .sheet-number {
   font-family: "IBM Plex Mono", monospace;
   font-size: 12px;
-  color: var(--accent);
+  color: var(--accent-strong);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 4px 8px;
@@ -233,30 +236,34 @@ button {
 .tool-card {
   position: relative;
   display: block;
-  background: var(--surface);
-  box-shadow: 0 12px 30px rgba(81, 71, 177, 0.07);
+  background: var(--glass-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--glass-shadow);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 20px 18px 18px;
   text-decoration: none;
   color: var(--ink);
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
 }
 
 .tool-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 16px 36px rgba(81, 71, 177, 0.14);
+  border-color: var(--accent-strong);
+  background: var(--glass-raised);
   transform: translateY(-2px);
 }
 
 .tool-card[data-disabled="true"] {
   color: var(--ink-faint);
   cursor: default;
+  opacity: 0.6;
 }
 
 .tool-card[data-disabled="true"]:hover {
   border-color: var(--line);
   transform: none;
+  background: var(--glass-surface);
 }
 
 .tool-card-tag {
@@ -291,19 +298,20 @@ button {
 .dropzone {
   position: relative;
   width: 100%;
-  border: 1px dashed var(--line);
+  border: 2px dashed var(--line);
   border-radius: var(--radius);
   padding: 48px 20px;
   text-align: center;
   cursor: pointer;
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.dropzone[data-active="true"] {
-  border-color: var(--accent);
-  background: var(--surface-raised);
+.dropzone[data-active="true"], .dropzone:hover {
+  border-color: var(--accent-strong);
+  background: var(--glass-surface);
 }
 
 .dropzone-hint {
@@ -311,52 +319,9 @@ button {
   font-size: 14px;
 }
 
+/* Ocultamos los crosshairs para el diseño glass */
 .crosshair {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  pointer-events: none;
-}
-
-.crosshair::before,
-.crosshair::after {
-  content: "";
-  position: absolute;
-  background: var(--ink-faint);
-}
-
-.crosshair::before {
-  width: 100%;
-  height: 1px;
-  top: 50%;
-  left: 0;
-}
-
-.crosshair::after {
-  height: 100%;
-  width: 1px;
-  left: 50%;
-  top: 0;
-}
-
-.crosshair-tl {
-  top: 8px;
-  left: 8px;
-}
-
-.crosshair-tr {
-  top: 8px;
-  right: 8px;
-}
-
-.crosshair-bl {
-  bottom: 8px;
-  left: 8px;
-}
-
-.crosshair-br {
-  bottom: 8px;
-  right: 8px;
+  display: none;
 }
 
 /* --- Lista de archivos --- */
@@ -368,6 +333,9 @@ button {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .file-row {
@@ -378,7 +346,6 @@ button {
   font-family: "IBM Plex Mono", monospace;
   font-size: 13px;
   border-bottom: 1px solid var(--line-soft);
-  background: var(--surface);
 }
 
 .file-row:last-child {
@@ -418,14 +385,16 @@ button {
   font-family: "Space Grotesk", sans-serif;
   font-weight: 600;
   font-size: 14px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--radius);
   padding: 13px 22px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: opacity 0.15s ease, transform 0.1s ease;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .btn:disabled {
@@ -438,19 +407,24 @@ button {
 }
 
 .btn-primary {
-  background: linear-gradient(110deg, var(--accent), var(--accent-strong));
-  color: var(--accent-ink);
-  box-shadow: 0 8px 18px rgba(92, 90, 222, 0.22);
+  background: rgba(192, 132, 252, 0.3);
+  border-color: rgba(192, 132, 252, 0.5);
+  color: #ffffff;
+  box-shadow: var(--glass-shadow);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: rgba(192, 132, 252, 0.45);
 }
 
 .btn-success {
-  background: transparent;
+  background: rgba(94, 234, 212, 0.2);
   color: var(--teal);
-  border: 1px solid var(--teal);
+  border-color: rgba(94, 234, 212, 0.4);
 }
 
 .btn-success:hover:not(:disabled) {
-  background: rgba(127, 209, 217, 0.1);
+  background: rgba(94, 234, 212, 0.35);
 }
 
 .btn:focus-visible {
@@ -465,7 +439,9 @@ button {
   border: 1px dashed var(--teal);
   border-radius: var(--radius);
   padding: 18px;
-  background: rgba(127, 209, 217, 0.06);
+  background: rgba(94, 234, 212, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .stamp {
@@ -494,10 +470,15 @@ button {
 /* --- Mensaje de error --- */
 
 .error-text {
-  color: var(--danger);
+  color: #ffe4e6;
+  background: rgba(225, 29, 72, 0.3);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(225, 29, 72, 0.5);
   font-family: "IBM Plex Mono", monospace;
   font-size: 13px;
   margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
 }
 
 .conversion-note {
@@ -520,7 +501,8 @@ button {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
-  background: var(--surface);
+  background: var(--glass-surface);
+  backdrop-filter: blur(8px);
 }
 
 .image-card img {
@@ -627,11 +609,13 @@ button {
   align-items: center;
   gap: 42px;
   padding: 64px 74px;
-  border: 1px solid rgba(105, 82, 202, 0.16);
+  border: 1px solid var(--glass-border);
   border-radius: 28px;
   overflow: hidden;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.96), rgba(247, 240, 255, 0.91));
-  box-shadow: 0 24px 60px rgba(91, 73, 182, 0.11);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--glass-shadow);
 }
 
 .hero-copy {
@@ -642,10 +626,11 @@ button {
 .hero-copy h1 {
   max-width: 590px;
   margin-top: 18px;
-  color: #2c2053;
+  color: #ffffff;
   font-size: clamp(42px, 5vw, 72px);
   line-height: 0.99;
   letter-spacing: -0.045em;
+  text-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
 .hero-copy p {
@@ -660,19 +645,21 @@ button {
   align-items: center;
   gap: 16px;
   padding: 14px 19px;
-  border-radius: 9px;
-  background: linear-gradient(105deg, #a958e9, #e779b6);
+  border-radius: 12px;
+  background: rgba(192, 132, 252, 0.3);
+  border: 1px solid rgba(192, 132, 252, 0.5);
+  backdrop-filter: blur(8px);
   color: #fff;
   font-family: "Space Grotesk", sans-serif;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 10px 22px rgba(174, 91, 219, 0.25);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.15s ease, background 0.15s ease;
 }
 
 .landing-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(174, 91, 219, 0.32);
+  background: rgba(192, 132, 252, 0.45);
 }
 
 .hero-art {
@@ -684,7 +671,7 @@ button {
 
 .hero-ring {
   position: absolute;
-  border: 2px dashed rgba(177, 93, 222, 0.55);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   transform: rotate(-18deg);
 }
@@ -692,13 +679,13 @@ button {
 .hero-ring-back {
   width: 355px;
   height: 250px;
-  background: rgba(210, 148, 255, 0.17);
+  background: rgba(192, 132, 252, 0.1);
 }
 
 .hero-ring-front {
   width: 280px;
   height: 330px;
-  border-color: rgba(91, 124, 239, 0.45);
+  border-color: rgba(94, 234, 212, 0.3);
   transform: rotate(22deg);
 }
 
@@ -706,16 +693,18 @@ button {
   position: absolute;
   width: 220px;
   height: 286px;
-  border: 1px solid rgba(105, 82, 202, 0.13);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 20px 36px rgba(74, 57, 156, 0.16);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--glass-shadow);
 }
 
 .file-preview-back {
   margin: 36px 0 0 88px;
   transform: rotate(11deg);
-  background: #f0e8ff;
+  background: rgba(192, 132, 252, 0.05);
 }
 
 .file-preview-main {
@@ -733,7 +722,7 @@ button {
   object-fit: cover;
   object-position: center;
   margin: 10px 0 18px;
-  box-shadow: 0 12px 20px rgba(78, 124, 240, 0.2);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
 }
 
 .file-corner {
@@ -742,7 +731,7 @@ button {
   right: 0;
   width: 38px;
   height: 38px;
-  background: #f2edff;
+  background: rgba(255, 255, 255, 0.2);
   clip-path: polygon(0 0, 100% 100%, 0 100%);
 }
 
@@ -751,16 +740,16 @@ button {
   height: 6px;
   margin-top: 8px;
   border-radius: 9px;
-  background: #ddd4f5;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .file-line-short {
   width: 48%;
-  background: #b971e8;
+  background: var(--accent-strong);
 }
 
 .preview-label {
-  color: #62509a;
+  color: var(--ink-soft);
   font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -771,13 +760,15 @@ button {
   position: absolute;
   z-index: 2;
   padding: 9px 13px;
-  border: 1px solid rgba(105, 82, 202, 0.16);
-  border-radius: 8px;
-  background: #fff;
-  color: #5c4d94;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
   font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
-  box-shadow: 0 9px 20px rgba(75, 57, 150, 0.14);
+  box-shadow: var(--glass-shadow);
 }
 
 .chip-top {
@@ -788,7 +779,7 @@ button {
 .chip-bottom {
   bottom: 45px;
   left: 28px;
-  color: #b14a99;
+  color: var(--teal);
 }
 
 .trust-strip {
@@ -798,8 +789,11 @@ button {
   gap: 28px;
   padding: 18px 24px;
   margin: 18px 0 72px;
-  border-radius: 10px;
-  background: linear-gradient(100deg, #a95bea, #c36bdd 55%, #e783bc);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
   color: #fff;
   font-family: "Space Grotesk", sans-serif;
   font-size: 13px;
@@ -807,7 +801,7 @@ button {
 }
 
 .trust-dots {
-  opacity: 0.72;
+  opacity: 0.5;
 }
 
 .landing-section {
@@ -825,7 +819,7 @@ button {
 .section-heading h2,
 .benefits-intro h2 {
   margin-top: 10px;
-  color: #2c2053;
+  color: #ffffff;
   font-size: 38px;
   line-height: 1.05;
 }
@@ -852,20 +846,26 @@ button {
   color: #fff;
   text-decoration: none;
   overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  background: var(--glass-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .landing-tool:hover {
   transform: translateY(-5px);
-  box-shadow: 0 18px 28px rgba(105, 67, 180, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
-.tool-tone-1 { background: linear-gradient(145deg, #8164e8, #b35be1); }
-.tool-tone-2 { background: linear-gradient(145deg, #b857d8, #e878b6); }
-.tool-tone-3 { background: linear-gradient(145deg, #5d80ed, #8b68e8); }
-.tool-tone-4 { background: linear-gradient(145deg, #e86db6, #b55cdb); }
-.tool-tone-5 { background: linear-gradient(145deg, #755fe0, #b968e2); }
-.tool-tone-6 { background: linear-gradient(145deg, #4f83e8, #8b68e8); }
+/* Tonos translúcidos para el grid del home */
+.tool-tone-1 { background: linear-gradient(145deg, rgba(129, 100, 232, 0.2), rgba(179, 91, 225, 0.2)); }
+.tool-tone-2 { background: linear-gradient(145deg, rgba(184, 87, 216, 0.2), rgba(232, 120, 182, 0.2)); }
+.tool-tone-3 { background: linear-gradient(145deg, rgba(93, 128, 237, 0.2), rgba(139, 104, 232, 0.2)); }
+.tool-tone-4 { background: linear-gradient(145deg, rgba(232, 109, 182, 0.2), rgba(181, 92, 219, 0.2)); }
+.tool-tone-5 { background: linear-gradient(145deg, rgba(117, 95, 224, 0.2), rgba(185, 104, 226, 0.2)); }
+.tool-tone-6 { background: linear-gradient(145deg, rgba(79, 131, 232, 0.2), rgba(139, 104, 232, 0.2)); }
 
 .tool-number,
 .tool-symbol {
@@ -896,7 +896,7 @@ button {
   justify-content: space-between;
   margin-top: 22px;
   padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-top: 1px solid var(--line-soft);
   font-size: 12px;
   opacity: 0.85;
 }
@@ -907,7 +907,11 @@ button {
   gap: 60px;
   padding: 58px 64px;
   border-radius: 24px;
-  background: linear-gradient(108deg, #9c5be8, #dc74c1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
   color: #fff;
 }
 
@@ -937,7 +941,8 @@ button {
   flex: 0 0 31px;
   place-items: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .benefit-item strong {
@@ -946,7 +951,7 @@ button {
 
 .benefit-item p {
   margin: 3px 0 0;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--ink-soft);
   font-size: 13px;
 }
 

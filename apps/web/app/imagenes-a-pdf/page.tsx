@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { FileDropzone } from "../../components/FileDropzone";
+import { CornerAdjuster } from "../../components/CornerAdjuster";
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
 
@@ -12,6 +13,10 @@ export default function ImagenesAPdfPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+
+  // Cuando se toma una foto en el momento (cámara), primero se muestra aquí
+  // para ajustar las 4 esquinas antes de agregarla a la lista.
+  const [cameraPreviewUrl, setCameraPreviewUrl] = useState<string | null>(null);
 
   function handleFilesSelected(newFiles: File[]) {
     const onlyImages = newFiles.filter(
@@ -25,6 +30,25 @@ export default function ImagenesAPdfPage() {
 
   function removeImage(index: number) {
     setImages((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function handleCameraCapture(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCameraPreviewUrl(URL.createObjectURL(file));
+    // Reseteamos el input para poder tomar otra foto después con el mismo botón
+    e.target.value = "";
+  }
+
+  function handleCornersConfirmed(blob: Blob) {
+    const scannedFile = new File([blob], `documento-escaneado-${Date.now()}.png`, {
+      type: "image/png",
+    });
+    setImages((prev) => [...prev, scannedFile]);
+    setCameraPreviewUrl(null);
+    setStatus("idle");
+    setResultUrl(null);
+    setErrorMsg(null);
   }
 
   async function handleConvert() {
@@ -104,15 +128,44 @@ export default function ImagenesAPdfPage() {
         <div>
           <h1 className="sheet-title">Imágenes a PDF</h1>
           <p className="sheet-desc">
-            Sube una o varias imágenes (JPG o PNG) y las juntamos en un PDF, en orden.
+            Sube imágenes (JPG/PNG) o toma una foto en el momento — si tomas la foto,
+            podrás ajustar las esquinas del documento antes de agregarla.
           </p>
         </div>
         <span className="sheet-number">HOJA 04</span>
       </div>
 
-      <FileDropzone accept="image/png, image/jpeg" onFilesSelected={handleFilesSelected} />
+      {cameraPreviewUrl ? (
+        <CornerAdjuster
+          imageUrl={cameraPreviewUrl}
+          onConfirm={handleCornersConfirmed}
+          onCancel={() => setCameraPreviewUrl(null)}
+        />
+      ) : (
+        <>
+          <FileDropzone accept="image/png, image/jpeg" onFilesSelected={handleFilesSelected} />
 
-      {images.length > 0 && (
+          <div style={{ marginTop: 12 }}>
+            <button
+              onClick={() => document.getElementById("camera-input")?.click()}
+              className="btn btn-success"
+              type="button"
+            >
+              📷 tomar foto ahora
+            </button>
+            <input
+              id="camera-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleCameraCapture}
+              style={{ display: "none" }}
+            />
+          </div>
+        </>
+      )}
+
+      {!cameraPreviewUrl && images.length > 0 && (
         <ul className="file-list">
           {images.map((img, i) => (
             <li key={i} className="file-row">
@@ -126,17 +179,19 @@ export default function ImagenesAPdfPage() {
         </ul>
       )}
 
-      <div style={{ marginTop: 24 }}>
-        <button
-          onClick={handleConvert}
-          disabled={status === "uploading" || status === "processing"}
-          className="btn btn-primary"
-        >
-          {status === "uploading" && "subiendo imágenes…"}
-          {status === "processing" && "creando pdf…"}
-          {(status === "idle" || status === "done" || status === "error") && "convertir a pdf →"}
-        </button>
-      </div>
+      {!cameraPreviewUrl && (
+        <div style={{ marginTop: 24 }}>
+          <button
+            onClick={handleConvert}
+            disabled={status === "uploading" || status === "processing"}
+            className="btn btn-primary"
+          >
+            {status === "uploading" && "subiendo imágenes…"}
+            {status === "processing" && "creando pdf…"}
+            {(status === "idle" || status === "done" || status === "error") && "convertir a pdf →"}
+          </button>
+        </div>
+      )}
 
       {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
 
