@@ -157,6 +157,10 @@ export function CornerAdjuster({ imageUrl, onConfirm, onCancel }: CornerAdjuster
               }}
             />
           ))}
+
+        {dragging && corners && displaySize.width > 0 && (
+          <Magnifier point={corners[dragging]} imageUrl={imageUrl} displaySize={displaySize} />
+        )}
       </div>
 
       <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -167,6 +171,70 @@ export function CornerAdjuster({ imageUrl, onConfirm, onCancel }: CornerAdjuster
           cancelar
         </button>
       </div>
+    </div>
+  );
+}
+
+const LOUPE_SIZE = 110;
+const LOUPE_ZOOM = 2.5;
+const LOUPE_OFFSET = 90; // separa la lupa del dedo para no taparla
+
+interface MagnifierProps {
+  point: Point;
+  imageUrl: string;
+  displaySize: { width: number; height: number };
+}
+
+/**
+ * Lupa flotante (como el recorte en polígono de Google Classroom): al
+ * arrastrar una esquina, muestra un acercamiento centrado en ese punto para
+ * poder ubicarlo con precisión sin que el dedo tape la imagen debajo.
+ */
+function Magnifier({ point, imageUrl, displaySize }: MagnifierProps) {
+  const showBelow = point.y - LOUPE_OFFSET - LOUPE_SIZE / 2 < 0;
+  const centerY = showBelow ? point.y + LOUPE_OFFSET : point.y - LOUPE_OFFSET;
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: point.x - LOUPE_SIZE / 2,
+        top: centerY - LOUPE_SIZE / 2,
+        width: LOUPE_SIZE,
+        height: LOUPE_SIZE,
+        borderRadius: "50%",
+        border: "3px solid #f2a93b",
+        boxShadow: "0 4px 14px rgba(0,0,0,0.4)",
+        overflow: "hidden",
+        pointerEvents: "none",
+        backgroundImage: `url(${imageUrl})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: `${displaySize.width * LOUPE_ZOOM}px ${displaySize.height * LOUPE_ZOOM}px`,
+        backgroundPosition: `${-(point.x * LOUPE_ZOOM - LOUPE_SIZE / 2)}px ${-(point.y * LOUPE_ZOOM - LOUPE_SIZE / 2)}px`,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: 0,
+          bottom: 0,
+          width: 1,
+          background: "rgba(242,169,59,0.9)",
+          transform: "translateX(-50%)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: 0,
+          right: 0,
+          height: 1,
+          background: "rgba(242,169,59,0.9)",
+          transform: "translateY(-50%)",
+        }}
+      />
     </div>
   );
 }
