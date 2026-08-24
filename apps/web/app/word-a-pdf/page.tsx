@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { SingleFileConverter } from "../../components/SingleFileConverter";
+
+export const metadata: Metadata = {
+  title: "Word a PDF gratis — convierte DOC y DOCX a PDF",
+  description:
+    "Convierte tus documentos Word (DOC/DOCX) a PDF conservando el formato, gratis y sin instalar nada.",
+  alternates: { canonical: "/word-a-pdf" },
+};
 
 export default function WordAPdfPage() {
   return (
