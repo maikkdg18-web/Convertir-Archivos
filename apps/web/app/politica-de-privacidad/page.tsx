@@ -36,9 +36,8 @@ export default function PoliticaDePrivacidadPage() {
             identidad junto a los archivos que procesas.
           </p>
           <p style={{ color: "var(--ink-faint)", fontSize: 13 }}>
-            Nota: al no requerir cuenta, la limpieza automática de archivos aún está en
-            desarrollo. Evita subir documentos con información sensible o confidencial hasta
-            que se implemente el borrado automático.
+            Los archivos (los que subes y los resultados generados) se borran automáticamente
+            del servidor pasada una hora.
           </p>
         </section>
 

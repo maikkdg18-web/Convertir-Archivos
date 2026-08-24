@@ -75,6 +75,27 @@ npx supabase secrets set CLOUDCONVERT_API_KEY=tu_clave_de_cloudconvert
 
 Después vuelve a desplegar las funciones. La clave solo se usa dentro de las Edge Functions y no se expone en la aplicación web.
 
+### Limpieza automática de archivos
+
+Como el sitio no tiene cuentas de usuario, los archivos subidos y los resultados generados
+se borran solos del bucket `conversions` pasada 1 hora, vía una Edge Function
+(`cleanup-old-files`) programada con `pg_cron`. Para activarla:
+
+```bash
+npx supabase functions deploy cleanup-old-files
+npx supabase db push
+```
+
+Y una sola vez, desde el SQL Editor del panel de Supabase (con tu URL y anon key reales,
+los mismos que usas en `.env.local`):
+
+```sql
+select vault.create_secret('https://tu-project-ref.supabase.co', 'project_url');
+select vault.create_secret('tu-anon-key', 'anon_key');
+```
+
+Sin esos dos secretos en Vault, el cron queda programado pero las llamadas fallarán.
+
 ## Roadmap futuro
 
 - Historial de conversiones por usuario (tabla en Postgres vía Supabase)
