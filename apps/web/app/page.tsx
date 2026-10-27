@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { LightGrid } from "../components/LightGrid";
 import { Combine, Download, FileImage, FileText, FileType, Image as ImageIcon, Minimize2, ShieldCheck, Zap } from "lucide-react";
 
 const TOOLS = [
@@ -91,7 +92,7 @@ export default function HomePage() {
           <p>Seis herramientas para resolver el trabajo cotidiano con tus archivos.</p>
         </div>
 
-        <div className="landing-tool-grid">
+        <LightGrid className="landing-tool-grid">
           {TOOLS.map((tool, index) => (
             <Link
               key={tool.route}
@@ -106,7 +107,7 @@ export default function HomePage() {
               <span className="landing-tool-action">Abrir herramienta <span aria-hidden="true">→</span></span>
             </Link>
           ))}
-        </div>
+        </LightGrid>
       </section>
 
       <section className="benefits-band">
