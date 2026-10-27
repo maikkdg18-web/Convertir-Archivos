@@ -27,6 +27,9 @@
   --r-md: 20px;
   --r-lg: 28px;
   --r-pill: 999px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 * {
@@ -177,6 +180,7 @@ button {
   font-weight: 600;
   color: var(--ink-soft);
   text-decoration: none;
+  transition: box-shadow 0.2s var(--ease-out), color 0.15s ease;
 }
 
 .back-link:hover {
@@ -226,7 +230,7 @@ button {
   box-shadow: var(--raised);
   color: var(--ink);
   text-decoration: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
 }
 
 .tool-card {
@@ -293,13 +297,22 @@ button {
   cursor: pointer;
   background: var(--surface);
   box-shadow: var(--inset);
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: box-shadow 0.25s var(--ease-out), border-color 0.2s ease, transform 0.25s var(--ease-out);
 }
 
 .dropzone[data-active="true"],
 .dropzone:hover {
   box-shadow: var(--raised);
   border-color: var(--accent);
+}
+
+.dropzone[data-active="true"] {
+  transform: scale(1.015);
+}
+
+.dropzone:hover .dropzone-icon,
+.dropzone[data-active="true"] .dropzone-icon {
+  transform: translateY(-4px);
 }
 
 .dropzone-icon {
@@ -312,6 +325,7 @@ button {
   background: var(--surface);
   box-shadow: var(--raised);
   color: var(--accent);
+  transition: transform 0.3s var(--ease-spring);
 }
 
 .dropzone-hint {
@@ -386,6 +400,7 @@ button {
   box-shadow: var(--raised-sm);
   color: var(--ink-soft);
   cursor: pointer;
+  transition: box-shadow 0.2s var(--ease-out), color 0.15s ease, transform 0.2s var(--ease-out);
 }
 
 .file-remove:hover {
@@ -396,9 +411,15 @@ button {
   color: var(--accent);
 }
 
+.file-remove:hover:not(:disabled),
+.file-move:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
 .file-remove:active,
 .file-move:active {
   box-shadow: var(--inset-sm);
+  transform: none;
 }
 
 .file-move:disabled {
@@ -426,15 +447,17 @@ button {
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
-  transition: box-shadow 0.15s ease, filter 0.15s ease;
+  transition: box-shadow 0.2s var(--ease-out), transform 0.2s var(--ease-out), filter 0.15s ease, color 0.15s ease;
 }
 
 .btn:hover:not(:disabled) {
   color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .btn:active:not(:disabled) {
   box-shadow: var(--inset-sm);
+  transform: none;
 }
 
 .btn-primary {
@@ -642,6 +665,7 @@ button {
   background: transparent;
   color: var(--ink-soft);
   cursor: pointer;
+  transition: color 0.15s ease;
 }
 
 .image-card button:hover:not(:disabled) {
@@ -718,10 +742,55 @@ button {
   font-weight: 500;
   color: var(--ink-soft);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 .site-footer-links a:hover {
   color: var(--accent);
+}
+
+/* --- Animaciones de entrada ---
+   fill-mode "backwards": al terminar, vuelven los estilos normales (hover, etc.).
+   Con prefers-reduced-motion el bloque de accesibilidad las anula. */
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+}
+
+@keyframes stampIn {
+  from { opacity: 0; transform: scale(0.6); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+}
+
+.landing-tool {
+  animation: riseIn 0.55s var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.result-panel,
+.result-block {
+  animation: popIn 0.45s var(--ease-spring) backwards;
+}
+
+.stamp {
+  animation: stampIn 0.4s var(--ease-spring) 0.15s backwards;
+}
+
+.error-text,
+.progress-wrap {
+  animation: slideDown 0.3s var(--ease-out) backwards;
+}
+
+.image-card {
+  animation: popIn 0.4s var(--ease-spring) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
 }
 
 /* --- Accesibilidad --- */
@@ -796,14 +865,16 @@ button {
   font-weight: 700;
   text-decoration: none;
   box-shadow: 4px 4px 12px rgba(109, 40, 217, 0.35), -4px -4px 12px var(--light);
-  transition: box-shadow 0.15s ease, filter 0.15s ease;
+  transition: box-shadow 0.2s var(--ease-out), transform 0.2s var(--ease-out), filter 0.15s ease;
 }
 
 .landing-button:hover {
   filter: brightness(1.08);
+  transform: translateY(-1px);
 }
 
 .landing-button:active {
+  transform: none;
   box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.3), inset -3px -3px 8px rgba(255, 255, 255, 0.15);
 }
 
@@ -997,6 +1068,11 @@ button {
   border-radius: 50%;
   box-shadow: var(--inset-sm);
   color: var(--accent);
+  transition: box-shadow 0.25s var(--ease-out);
+}
+
+.landing-tool:hover .tool-symbol {
+  box-shadow: var(--raised-sm);
 }
 
 .landing-tool .tool-card-tag {

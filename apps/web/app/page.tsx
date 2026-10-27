@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Combine, Download, FileImage, FileText, FileType, Image as ImageIcon, Minimize2, ShieldCheck, Zap } from "lucide-react";
 
@@ -92,7 +93,12 @@ export default function HomePage() {
 
         <div className="landing-tool-grid">
           {TOOLS.map((tool, index) => (
-            <Link key={tool.route} href={tool.route} className="landing-tool">
+            <Link
+              key={tool.route}
+              href={tool.route}
+              className="landing-tool"
+              style={{ "--i": index } as CSSProperties}
+            >
               <span className="tool-number">0{index + 1}</span>
               <span className="tool-symbol" aria-hidden="true"><tool.icon size={22} /></span>
               <span className="tool-card-tag">{tool.tag}</span>

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { supabase } from "../../lib/supabase";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Camera, X } from "lucide-react";
 import { toFriendlyError } from "@conversor/shared";
 import { FileDropzone } from "../../components/FileDropzone";
@@ -17,6 +18,7 @@ export default function ImagenesAPdfPage() {
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [uploadedCount, setUploadedCount] = useState(0);
+  const [listRef] = useAutoAnimate<HTMLUListElement>({ duration: 250 });
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // Cuando se toma una foto en el momento (cámara), primero se muestra aquí
@@ -172,7 +174,7 @@ export default function ImagenesAPdfPage() {
       )}
 
       {!cameraPreviewUrl && images.length > 0 && (
-        <ul className="file-list">
+        <ul ref={listRef} className="file-list">
           {images.map((img, i) => (
             <li key={i} className="file-row">
               <span className="file-index">{String(i + 1).padStart(2, "0")}</span>

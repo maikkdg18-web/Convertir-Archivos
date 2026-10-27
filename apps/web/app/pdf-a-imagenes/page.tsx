@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { toFriendlyError } from "@conversor/shared";
@@ -140,7 +141,7 @@ export default function PdfAImagenesPage() {
           <div className="image-grid">
             {images.map((url, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <div key={i} className="image-card">
+              <div key={i} className="image-card" style={{ "--i": i } as CSSProperties}>
                 <img src={url} alt={`Página ${i + 1}`} />
                 <button onClick={() => handleDownload(url, i)} disabled={downloadingIndex === i}>
                   {downloadingIndex === i ? "Descargando…" : `Página ${i + 1}`}

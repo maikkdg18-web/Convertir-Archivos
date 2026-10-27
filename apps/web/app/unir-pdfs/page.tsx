@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { toFriendlyError } from "@conversor/shared";
 import { supabase } from "../../lib/supabase";
@@ -21,6 +22,8 @@ export default function UnirPdfsPage() {
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [uploadedCount, setUploadedCount] = useState(0);
+  // Anima entrada, salida y reordenado de filas (respeta prefers-reduced-motion)
+  const [listRef] = useAutoAnimate<HTMLUListElement>({ duration: 250 });
 
   function handleFilesSelected(newFiles: File[]) {
     const onlyPdfs = newFiles.filter((f) => f.type === "application/pdf");
@@ -135,7 +138,7 @@ export default function UnirPdfsPage() {
       <FileDropzone accept="application/pdf" onFilesSelected={handleFilesSelected} />
 
       {files.length > 0 && (
-        <ul className="file-list">
+        <ul ref={listRef} className="file-list">
           {files.map(({ id, file }, i) => (
             <li key={id} className="file-row">
               <span className="file-index">{String(i + 1).padStart(2, "0")}</span>
