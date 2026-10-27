@@ -1,5 +1,6 @@
 import "./globals.css";
 import Link from "next/link";
+import Script from "next/script";
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "../lib/site";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -56,14 +57,17 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4811758361067744"
-          crossOrigin="anonymous"
-        />
       </head>
 
       <body>
+        {/* AdSense inserta nodos en <head> al cargar; con un <script> estático ahí React falla
+            al hidratar y repinta el documento (se pierden data-theme y los eventos). */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4811758361067744"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <header className="letterhead">
           <div className="letterhead-inner">
             <Link
