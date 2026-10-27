@@ -1,38 +1,39 @@
 import Link from "next/link";
+import { Combine, Download, FileImage, FileText, FileType, Image as ImageIcon, Minimize2, ShieldCheck, Zap } from "lucide-react";
 
 const TOOLS = [
   {
-    sheet: "01",
+    icon: Combine,
     tag: "PDF + PDF → PDF",
     name: "Unir PDFs",
     route: "/unir-pdfs",
   },
   {
-    sheet: "02",
+    icon: Minimize2,
     tag: "PDF → PDF",
     name: "Comprimir PDF",
     route: "/comprimir-pdf",
   },
   {
-    sheet: "03",
+    icon: ImageIcon,
     tag: "PDF → PNG",
     name: "PDF a imágenes",
     route: "/pdf-a-imagenes",
   },
   {
-    sheet: "04",
+    icon: FileImage,
     tag: "PNG/JPG → PDF",
     name: "Imágenes a PDF",
     route: "/imagenes-a-pdf",
   },
   {
-    sheet: "05",
+    icon: FileText,
     tag: "DOC/DOCX → PDF",
     name: "Word a PDF",
     route: "/word-a-pdf",
   },
   {
-    sheet: "06",
+    icon: FileType,
     tag: "PDF → DOCX",
     name: "PDF a Word",
     route: "/pdf-a-word",
@@ -77,7 +78,6 @@ export default function HomePage() {
 
       <div className="trust-strip">
         <span>Todo lo que necesitas para tus documentos</span>
-        <span className="trust-dots" aria-hidden="true">✦ · ✦ · ✦</span>
         <span>Rápido · claro · sin marcas de agua</span>
       </div>
 
@@ -92,9 +92,9 @@ export default function HomePage() {
 
         <div className="landing-tool-grid">
           {TOOLS.map((tool, index) => (
-            <Link key={tool.route} href={tool.route} className={`landing-tool tool-tone-${index + 1}`}>
+            <Link key={tool.route} href={tool.route} className="landing-tool">
               <span className="tool-number">0{index + 1}</span>
-              <span className="tool-symbol" aria-hidden="true">↗</span>
+              <span className="tool-symbol" aria-hidden="true"><tool.icon size={22} /></span>
               <span className="tool-card-tag">{tool.tag}</span>
               <span className="tool-card-name">{tool.name}</span>
               <span className="landing-tool-action">Abrir herramienta <span aria-hidden="true">→</span></span>
@@ -109,9 +109,9 @@ export default function HomePage() {
           <h2>Menos pasos.<br />Más resultados.</h2>
         </div>
         <div className="benefit-list">
-          <div className="benefit-item"><span>✦</span><div><strong>Sin instalaciones</strong><p>Trabaja directamente desde tu navegador.</p></div></div>
-          <div className="benefit-item"><span>↗</span><div><strong>Flujo sencillo</strong><p>Sube tus archivos y descarga el resultado.</p></div></div>
-          <div className="benefit-item"><span>✓</span><div><strong>Resultados limpios</strong><p>Tus documentos salen sin marcas de agua.</p></div></div>
+          <div className="benefit-item"><span aria-hidden="true"><Download size={18} /></span><div><strong>Sin instalaciones</strong><p>Trabaja directamente desde tu navegador.</p></div></div>
+          <div className="benefit-item"><span aria-hidden="true"><Zap size={18} /></span><div><strong>Flujo sencillo</strong><p>Sube tus archivos y descarga el resultado.</p></div></div>
+          <div className="benefit-item"><span aria-hidden="true"><ShieldCheck size={18} /></span><div><strong>Resultados limpios</strong><p>Tus documentos salen sin marcas de agua.</p></div></div>
         </div>
       </section>
     </main>

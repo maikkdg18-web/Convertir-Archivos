@@ -79,7 +79,7 @@ export default function RootLayout({
 
         <footer className="site-footer">
           <div className="site-footer-inner">
-            <span className="muted mono" style={{ fontSize: 12 }}>
+            <span className="footer-copy">
               © {new Date().getFullYear()} {SITE_NAME}
             </span>
             <nav className="site-footer-links">

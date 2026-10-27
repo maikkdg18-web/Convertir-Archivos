@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { toFriendlyError } from "@conversor/shared";
 import { supabase } from "../lib/supabase";
 import { FileDropzone } from "./FileDropzone";
+import { Progress } from "./Progress";
 
 interface SingleFileConverterProps {
   title: string;
   description: string;
-  sheet: string;
   accept: string;
   acceptedTypes: string[];
   functionName: string;
@@ -22,7 +23,6 @@ type Status = "idle" | "uploading" | "processing" | "done" | "error";
 export function SingleFileConverter({
   title,
   description,
-  sheet,
   accept,
   acceptedTypes,
   functionName,
@@ -86,20 +86,6 @@ export function SingleFileConverter({
           if (errorBody?.error) functionMessage = errorBody.error;
         }
 
-        const normalizedMessage = functionMessage.toLowerCase();
-        if (normalizedMessage.includes("failed to send a request")) {
-          functionMessage = "La función de conversión aún no está desplegada en Supabase.";
-        } else if (
-          normalizedMessage.includes("credit") ||
-          normalizedMessage.includes("quota") ||
-          normalizedMessage.includes("limit") ||
-          normalizedMessage.includes("daily")
-        ) {
-          functionMessage = "Se alcanzó el límite diario de conversiones. Intenta de nuevo mañana.";
-        } else if (normalizedMessage.includes("unauthorized") || normalizedMessage.includes("api key")) {
-          functionMessage = "La clave de CloudConvert no es válida o fue revocada.";
-        }
-
         throw new Error(functionMessage);
       }
       if (!data?.success) throw new Error(data?.error ?? "No se pudo convertir el archivo.");
@@ -107,7 +93,7 @@ export function SingleFileConverter({
       setResultUrl(data.outputUrl);
       setStatus("done");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
+      setErrorMsg(toFriendlyError(err instanceof Error ? err.message : "Error desconocido"));
       setStatus("error");
     }
   }
@@ -138,13 +124,12 @@ export function SingleFileConverter({
 
   return (
     <main className="page">
-      <a href="/" className="back-link">← volver al set</a>
+      <a href="/" className="back-link">← Todas las herramientas</a>
       <div className="sheet-header">
         <div>
           <h1 className="sheet-title">{title}</h1>
           <p className="sheet-desc">{description}</p>
         </div>
-        <span className="sheet-number">HOJA {sheet}</span>
       </div>
 
       <FileDropzone accept={accept} multiple={false} onFilesSelected={handleFilesSelected} />
@@ -154,29 +139,32 @@ export function SingleFileConverter({
           <li className="file-row">
             <span className="file-index">01</span>
             <span className="file-name">{file.name}</span>
-            <span className="file-index">{formatBytes(file.size)}</span>
+            <span className="file-size">{formatBytes(file.size)}</span>
           </li>
         </ul>
       )}
 
-      <div style={{ marginTop: 24 }}>
+      <div className="actions">
         <button onClick={handleConvert} disabled={isBusy} className="btn btn-primary">
-          {status === "uploading" && "subiendo archivo…"}
+          {status === "uploading" && "Subiendo archivo…"}
           {status === "processing" && processingLabel}
           {(status === "idle" || status === "done" || status === "error") && buttonLabel}
         </button>
       </div>
 
+      {status === "uploading" && <Progress label="Subiendo archivo…" />}
+      {status === "processing" && <Progress label={processingLabel} />}
+
       {usageNote && <p className="conversion-note">{usageNote}</p>}
 
-      {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
+      {errorMsg && <p className="error-text" role="alert">{errorMsg}</p>}
 
       {status === "done" && resultUrl && (
-        <div className="result-panel">
-          <span className="stamp">✓ listo</span>
+        <div className="result-panel" role="status">
+          <span className="stamp">✓ Listo</span>
           <p className="result-meta">Tu archivo quedó convertido y listo para descargar.</p>
           <button onClick={handleDownload} disabled={isDownloading} className="btn btn-success">
-            {isDownloading ? "descargando…" : `descargar ${outputName.split(".").pop()}`}
+            {isDownloading ? "Descargando…" : `Descargar ${outputName.split(".").pop()?.toUpperCase()}`}
           </button>
         </div>
       )}
@@ -185,7 +173,7 @@ export function SingleFileConverter({
 }
 
 function sanitizeFileName(name: string): string {
-  const normalized = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const normalized = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
   return normalized.replace(/[^a-zA-Z0-9._-]/g, "-").replace(/-+/g, "-");
 }
 

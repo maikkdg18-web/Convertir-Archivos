@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { ArrowUp } from "lucide-react";
 
 interface FileDropzoneProps {
   accept: string;
@@ -10,6 +11,7 @@ interface FileDropzoneProps {
 
 export function FileDropzone({ accept, multiple = true, onFilesSelected }: FileDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -25,6 +27,8 @@ export function FileDropzone({ accept, multiple = true, onFilesSelected }: FileD
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files ? Array.from(e.target.files) : [];
       if (files.length) onFilesSelected(files);
+      // Permite volver a elegir el mismo archivo después de quitarlo
+      e.target.value = "";
     },
     [onFilesSelected]
   );
@@ -39,24 +43,25 @@ export function FileDropzone({ accept, multiple = true, onFilesSelected }: FileD
       }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
-      onClick={() => document.getElementById("file-input")?.click()}
+      onClick={() => inputRef.current?.click()}
       role="button"
+      aria-label="Subir archivos"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
-          document.getElementById("file-input")?.click();
+          e.preventDefault();
+          inputRef.current?.click();
         }
       }}
     >
-      <span className="crosshair crosshair-tl" />
-      <span className="crosshair crosshair-tr" />
-      <span className="crosshair crosshair-bl" />
-      <span className="crosshair crosshair-br" />
-      <p className="dropzone-hint mono">
-        arrastra tus archivos aquí — o haz click para elegirlos
+      <span className="dropzone-icon" aria-hidden="true">
+        <ArrowUp size={28} strokeWidth={2.25} />
+      </span>
+      <p className="dropzone-hint">
+        Arrastra tus archivos aquí o <strong>haz clic para elegirlos</strong>
       </p>
       <input
-        id="file-input"
+        ref={inputRef}
         type="file"
         accept={accept}
         multiple={multiple}

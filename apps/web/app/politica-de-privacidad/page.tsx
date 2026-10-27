@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function PoliticaDePrivacidadPage() {
   return (
     <main className="page">
-      <a href="/" className="back-link">← volver al set</a>
+      <a href="/" className="back-link">← Todas las herramientas</a>
 
       <div className="sheet-header">
         <div>
@@ -19,9 +19,9 @@ export default function PoliticaDePrivacidadPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gap: 22, maxWidth: 640 }}>
+      <div className="static-card">
         <section>
-          <h2 style={{ fontSize: 18, marginBottom: 8 }}>1. Qué archivos procesamos</h2>
+          <h2>1. Qué archivos procesamos</h2>
           <p>
             Cuando usas alguna herramienta de {SITE_NAME}, el archivo que subes se almacena
             temporalmente para poder generar el resultado de la conversión (unir, comprimir,
@@ -35,14 +35,14 @@ export default function PoliticaDePrivacidadPage() {
             No pidas permiso de cuenta ni inicio de sesión para usar el sitio: no guardamos tu
             identidad junto a los archivos que procesas.
           </p>
-          <p style={{ color: "var(--ink-faint)", fontSize: 13 }}>
+          <p className="static-note">
             Los archivos (los que subes y los resultados generados) se borran automáticamente
             del servidor pasada una hora.
           </p>
         </section>
 
         <section>
-          <h2 style={{ fontSize: 18, marginBottom: 8 }}>2. Cookies y publicidad</h2>
+          <h2>2. Cookies y publicidad</h2>
           <p>
             Este sitio muestra anuncios a través de <strong>Google AdSense</strong>. Google y
             sus socios publicitarios pueden usar cookies para mostrar anuncios según tus
@@ -68,7 +68,7 @@ export default function PoliticaDePrivacidadPage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: 18, marginBottom: 8 }}>3. Qué NO recolectamos</h2>
+          <h2>3. Qué NO recolectamos</h2>
           <p>
             No pedimos ni guardamos nombre, correo, ni ningún dato personal para usar las
             herramientas de conversión. No usamos analítica propia de seguimiento de usuarios
@@ -77,11 +77,11 @@ export default function PoliticaDePrivacidadPage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: 18, marginBottom: 8 }}>4. Contacto</h2>
+          <h2>4. Contacto</h2>
           <p>
             Si tienes preguntas sobre esta política o quieres solicitar la eliminación de un
             archivo que subiste, escríbenos a{" "}
-            <a href={`mailto:${CONTACT_EMAIL}`} className="mono">
+            <a href={`mailto:${CONTACT_EMAIL}`}>
               {CONTACT_EMAIL}
             </a>
             .

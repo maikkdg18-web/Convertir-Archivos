@@ -13,13 +13,12 @@ export default function WordAPdfPage() {
     <SingleFileConverter
       title="Word a PDF"
       description="Convierte documentos DOC y DOCX a PDF conservando su formato para compartirlos fácilmente."
-      sheet="05"
       accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       acceptedTypes={["application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]}
       functionName="convert-word-to-pdf"
       outputName="documento-convertido.pdf"
-      buttonLabel="convertir a pdf →"
-      processingLabel="convirtiendo a pdf…"
+      buttonLabel="Convertir a PDF →"
+      processingLabel="Convirtiendo a PDF…"
       usageNote="Plan gratuito: hasta 10 conversiones diarias. Los archivos deben pesar menos de 1 GB."
     />
   );

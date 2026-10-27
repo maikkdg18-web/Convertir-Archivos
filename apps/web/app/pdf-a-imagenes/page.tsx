@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
+import { toFriendlyError } from "@conversor/shared";
 import { FileDropzone } from "../../components/FileDropzone";
+import { Progress } from "../../components/Progress";
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
 
@@ -57,7 +59,7 @@ export default function PdfAImagenesPage() {
       setImages(data.outputUrls);
       setStatus("done");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
+      setErrorMsg(toFriendlyError(err instanceof Error ? err.message : "Error desconocido"));
       setStatus("error");
     }
   }
@@ -92,7 +94,7 @@ export default function PdfAImagenesPage() {
 
   return (
     <main className="page">
-      <a href="/" className="back-link">← volver al set</a>
+      <a href="/" className="back-link">← Todas las herramientas</a>
 
       <div className="sheet-header">
         <div>
@@ -101,37 +103,37 @@ export default function PdfAImagenesPage() {
             Sube un PDF y convertimos cada página en una imagen PNG.
           </p>
         </div>
-        <span className="sheet-number">HOJA 03</span>
       </div>
 
       <FileDropzone accept="application/pdf" multiple={false} onFilesSelected={handleFilesSelected} />
 
       {file && (
-        <p className="mono muted" style={{ marginTop: 14, fontSize: 13 }}>
-          {file.name}
-        </p>
+        <p className="muted file-selected">{file.name}</p>
       )}
 
-      <div style={{ marginTop: 24 }}>
+      <div className="actions">
         <button
           onClick={handleConvert}
           disabled={status === "uploading" || status === "processing"}
           className="btn btn-primary"
         >
-          {status === "uploading" && "subiendo archivo…"}
-          {status === "processing" && "convirtiendo páginas…"}
-          {(status === "idle" || status === "done" || status === "error") && "convertir a imágenes →"}
+          {status === "uploading" && "Subiendo archivo…"}
+          {status === "processing" && "Convirtiendo páginas…"}
+          {(status === "idle" || status === "done" || status === "error") && "Convertir a imágenes →"}
         </button>
       </div>
 
-      {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
+      {status === "uploading" && <Progress label="Subiendo archivo…" />}
+      {status === "processing" && <Progress label="Convirtiendo páginas…" />}
+
+      {errorMsg && <p className="error-text" role="alert">{errorMsg}</p>}
 
       {status === "done" && images.length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <span className="stamp" style={{ margin: 0 }}>✓ {images.length} páginas</span>
-            <button onClick={handleDownloadAll} className="btn btn-success" style={{ padding: "8px 14px", fontSize: 13 }}>
-              descargar todas
+        <div className="result-block" role="status">
+          <div className="result-toolbar">
+            <span className="stamp">✓ {images.length} páginas</span>
+            <button onClick={handleDownloadAll} className="btn btn-success">
+              Descargar todas
             </button>
           </div>
 
@@ -141,7 +143,7 @@ export default function PdfAImagenesPage() {
               <div key={i} className="image-card">
                 <img src={url} alt={`Página ${i + 1}`} />
                 <button onClick={() => handleDownload(url, i)} disabled={downloadingIndex === i}>
-                  {downloadingIndex === i ? "descargando…" : `página ${i + 1}`}
+                  {downloadingIndex === i ? "Descargando…" : `Página ${i + 1}`}
                 </button>
               </div>
             ))}

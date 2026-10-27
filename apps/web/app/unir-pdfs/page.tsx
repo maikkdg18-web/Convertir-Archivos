@@ -1,28 +1,50 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowDown, ArrowUp, X } from "lucide-react";
+import { toFriendlyError } from "@conversor/shared";
 import { supabase } from "../../lib/supabase";
 import { FileDropzone } from "../../components/FileDropzone";
+import { Progress } from "../../components/Progress";
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
 
+interface QueuedFile {
+  id: string;
+  file: File;
+}
+
 export default function UnirPdfsPage() {
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<QueuedFile[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [uploadedCount, setUploadedCount] = useState(0);
 
   function handleFilesSelected(newFiles: File[]) {
     const onlyPdfs = newFiles.filter((f) => f.type === "application/pdf");
-    setFiles((prev) => [...prev, ...onlyPdfs]);
+    setFiles((prev) => [
+      ...prev,
+      ...onlyPdfs.map((file) => ({ id: crypto.randomUUID(), file })),
+    ]);
     setStatus("idle");
     setResultUrl(null);
-    setErrorMsg(null);
+    setErrorMsg(onlyPdfs.length < newFiles.length ? "Solo se aceptan PDFs" : null);
   }
 
-  function removeFile(index: number) {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+  function removeFile(id: string) {
+    setFiles((prev) => prev.filter((f) => f.id !== id));
+  }
+
+  function moveFile(index: number, direction: -1 | 1) {
+    setFiles((prev) => {
+      const target = index + direction;
+      if (target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
   }
 
   async function handleMerge() {
@@ -32,12 +54,13 @@ export default function UnirPdfsPage() {
     }
 
     setStatus("uploading");
+    setUploadedCount(0);
     setErrorMsg(null);
 
     try {
       const fileUrls: string[] = [];
 
-      for (const file of files) {
+      for (const { file } of files) {
         const safeName = sanitizeFileName(file.name);
         const path = `uploads/${crypto.randomUUID()}-${safeName}`;
         const { error: uploadError } = await supabase.storage
@@ -51,6 +74,7 @@ export default function UnirPdfsPage() {
           .getPublicUrl(path);
 
         fileUrls.push(publicUrlData.publicUrl);
+        setUploadedCount(fileUrls.length);
       }
 
       setStatus("processing");
@@ -66,7 +90,7 @@ export default function UnirPdfsPage() {
       setResultUrl(data.outputUrl);
       setStatus("done");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
+      setErrorMsg(toFriendlyError(err instanceof Error ? err.message : "Error desconocido"));
       setStatus("error");
     }
   }
@@ -93,56 +117,85 @@ export default function UnirPdfsPage() {
     }
   }
 
+  const isBusy = status === "uploading" || status === "processing";
+
   return (
     <main className="page">
-      <a href="/" className="back-link">← volver al set</a>
+      <a href="/" className="back-link">← Todas las herramientas</a>
 
       <div className="sheet-header">
         <div>
           <h1 className="sheet-title">Unir PDFs</h1>
           <p className="sheet-desc">
-            Sube 2 o más PDFs y los unimos en uno solo, en el orden en que los agregues.
+            Sube 2 o más PDFs y los unimos en uno solo. Puedes reordenarlos antes de unirlos.
           </p>
         </div>
-        <span className="sheet-number">HOJA 01</span>
       </div>
 
       <FileDropzone accept="application/pdf" onFilesSelected={handleFilesSelected} />
 
       {files.length > 0 && (
         <ul className="file-list">
-          {files.map((file, i) => (
-            <li key={i} className="file-row">
+          {files.map(({ id, file }, i) => (
+            <li key={id} className="file-row">
               <span className="file-index">{String(i + 1).padStart(2, "0")}</span>
               <span className="file-name">{file.name}</span>
-              <button onClick={() => removeFile(i)} className="file-remove">
-                quitar
+              <button
+                type="button"
+                onClick={() => moveFile(i, -1)}
+                disabled={i === 0 || isBusy}
+                className="file-move"
+                aria-label={`Mover ${file.name} arriba`}
+              >
+                <ArrowUp size={18} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => moveFile(i, 1)}
+                disabled={i === files.length - 1 || isBusy}
+                className="file-move"
+                aria-label={`Mover ${file.name} abajo`}
+              >
+                <ArrowDown size={18} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => removeFile(id)}
+                disabled={isBusy}
+                className="file-remove"
+                aria-label={`Quitar ${file.name}`}
+              >
+                <X size={18} aria-hidden="true" />
               </button>
             </li>
           ))}
         </ul>
       )}
 
-      <div style={{ marginTop: 24 }}>
-        <button
-          onClick={handleMerge}
-          disabled={status === "uploading" || status === "processing"}
-          className="btn btn-primary"
-        >
-          {status === "uploading" && "subiendo archivos…"}
-          {status === "processing" && "uniendo pdfs…"}
-          {(status === "idle" || status === "done" || status === "error") && "unir pdfs →"}
+      <div className="actions">
+        <button onClick={handleMerge} disabled={isBusy} className="btn btn-primary">
+          {status === "uploading" && "Subiendo archivos…"}
+          {status === "processing" && "Uniendo PDFs…"}
+          {(status === "idle" || status === "done" || status === "error") && "Unir PDFs →"}
         </button>
       </div>
 
-      {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
+      {status === "uploading" && (
+        <Progress
+          label={`Subiendo ${Math.min(uploadedCount + 1, files.length)} de ${files.length}…`}
+          value={(uploadedCount / files.length) * 100}
+        />
+      )}
+      {status === "processing" && <Progress label="Uniendo PDFs…" />}
+
+      {errorMsg && <p className="error-text" role="alert">{errorMsg}</p>}
 
       {status === "done" && resultUrl && (
-        <div className="result-panel">
-          <span className="stamp">✓ listo</span>
+        <div className="result-panel" role="status">
+          <span className="stamp">✓ Listo</span>
           <p className="result-meta">Tu PDF quedó unido y listo para descargar.</p>
           <button onClick={handleDownload} disabled={isDownloading} className="btn btn-success">
-            {isDownloading ? "descargando…" : "descargar pdf"}
+            {isDownloading ? "Descargando…" : "Descargar PDF"}
           </button>
         </div>
       )}
@@ -151,6 +204,6 @@ export default function UnirPdfsPage() {
 }
 
 function sanitizeFileName(name: string): string {
-  const normalized = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const normalized = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
   return normalized.replace(/[^a-zA-Z0-9._-]/g, "-").replace(/-+/g, "-");
 }

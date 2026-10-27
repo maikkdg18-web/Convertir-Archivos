@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { supabase } from "../../lib/supabase";
+import { Camera, X } from "lucide-react";
+import { toFriendlyError } from "@conversor/shared";
 import { FileDropzone } from "../../components/FileDropzone";
+import { Progress } from "../../components/Progress";
 import { CornerAdjuster } from "../../components/CornerAdjuster";
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
@@ -13,6 +16,8 @@ export default function ImagenesAPdfPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [uploadedCount, setUploadedCount] = useState(0);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // Cuando se toma una foto en el momento (cámara), primero se muestra aquí
   // para ajustar las 4 esquinas antes de agregarla a la lista.
@@ -58,6 +63,7 @@ export default function ImagenesAPdfPage() {
     }
 
     setStatus("uploading");
+    setUploadedCount(0);
     setErrorMsg(null);
 
     try {
@@ -78,6 +84,7 @@ export default function ImagenesAPdfPage() {
           .getPublicUrl(path);
 
         fileUrls.push(publicUrlData.publicUrl);
+        setUploadedCount(fileUrls.length);
       }
 
       setStatus("processing");
@@ -93,7 +100,7 @@ export default function ImagenesAPdfPage() {
       setResultUrl(data.outputUrl);
       setStatus("done");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
+      setErrorMsg(toFriendlyError(err instanceof Error ? err.message : "Error desconocido"));
       setStatus("error");
     }
   }
@@ -122,7 +129,7 @@ export default function ImagenesAPdfPage() {
 
   return (
     <main className="page">
-      <a href="/" className="back-link">← volver al set</a>
+      <a href="/" className="back-link">← Todas las herramientas</a>
 
       <div className="sheet-header">
         <div>
@@ -132,7 +139,6 @@ export default function ImagenesAPdfPage() {
             podrás ajustar las esquinas del documento antes de agregarla.
           </p>
         </div>
-        <span className="sheet-number">HOJA 04</span>
       </div>
 
       {cameraPreviewUrl ? (
@@ -145,16 +151,16 @@ export default function ImagenesAPdfPage() {
         <>
           <FileDropzone accept="image/png, image/jpeg" onFilesSelected={handleFilesSelected} />
 
-          <div style={{ marginTop: 12 }}>
+          <div className="actions actions-tight">
             <button
-              onClick={() => document.getElementById("camera-input")?.click()}
-              className="btn btn-success"
+              onClick={() => cameraInputRef.current?.click()}
+              className="btn btn-secondary"
               type="button"
             >
-              📷 tomar foto ahora
+              <Camera size={18} aria-hidden="true" /> Tomar foto ahora
             </button>
             <input
-              id="camera-input"
+              ref={cameraInputRef}
               type="file"
               accept="image/*"
               capture="environment"
@@ -171,8 +177,13 @@ export default function ImagenesAPdfPage() {
             <li key={i} className="file-row">
               <span className="file-index">{String(i + 1).padStart(2, "0")}</span>
               <span className="file-name">{img.name}</span>
-              <button onClick={() => removeImage(i)} className="file-remove">
-                quitar
+              <button
+                type="button"
+                onClick={() => removeImage(i)}
+                className="file-remove"
+                aria-label={`Quitar ${img.name}`}
+              >
+                <X size={18} aria-hidden="true" />
               </button>
             </li>
           ))}
@@ -180,27 +191,35 @@ export default function ImagenesAPdfPage() {
       )}
 
       {!cameraPreviewUrl && (
-        <div style={{ marginTop: 24 }}>
+        <div className="actions">
           <button
             onClick={handleConvert}
             disabled={status === "uploading" || status === "processing"}
             className="btn btn-primary"
           >
-            {status === "uploading" && "subiendo imágenes…"}
-            {status === "processing" && "creando pdf…"}
-            {(status === "idle" || status === "done" || status === "error") && "convertir a pdf →"}
+            {status === "uploading" && "Subiendo imágenes…"}
+            {status === "processing" && "Creando PDF…"}
+            {(status === "idle" || status === "done" || status === "error") && "Convertir a PDF →"}
           </button>
         </div>
       )}
 
-      {errorMsg && <p className="error-text">⚠ {errorMsg}</p>}
+      {status === "uploading" && (
+        <Progress
+          label={`Subiendo ${Math.min(uploadedCount + 1, images.length)} de ${images.length}…`}
+          value={(uploadedCount / images.length) * 100}
+        />
+      )}
+      {status === "processing" && <Progress label="Creando PDF…" />}
+
+      {errorMsg && <p className="error-text" role="alert">{errorMsg}</p>}
 
       {status === "done" && resultUrl && (
-        <div className="result-panel">
-          <span className="stamp">✓ listo</span>
+        <div className="result-panel" role="status">
+          <span className="stamp">✓ Listo</span>
           <p className="result-meta">Tu PDF quedó creado y listo para descargar.</p>
           <button onClick={handleDownload} disabled={isDownloading} className="btn btn-success">
-            {isDownloading ? "descargando…" : "descargar pdf"}
+            {isDownloading ? "Descargando…" : "Descargar PDF"}
           </button>
         </div>
       )}

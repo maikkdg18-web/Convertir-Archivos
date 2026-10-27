@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function ContactoPage() {
   return (
     <main className="page">
-      <a href="/" className="back-link">← volver al set</a>
+      <a href="/" className="back-link">← Todas las herramientas</a>
 
       <div className="sheet-header">
         <div>
@@ -21,10 +21,10 @@ export default function ContactoPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gap: 20, maxWidth: 640 }}>
+      <div className="static-card">
         <p>
           Puedes escribirnos directamente por correo a:{" "}
-          <a href={`mailto:${CONTACT_EMAIL}`} className="mono">
+          <a href={`mailto:${CONTACT_EMAIL}`}>
             {CONTACT_EMAIL}
           </a>
         </p>

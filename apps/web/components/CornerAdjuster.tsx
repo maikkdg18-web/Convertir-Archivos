@@ -98,8 +98,8 @@ export function CornerAdjuster({ imageUrl, onConfirm, onCancel }: CornerAdjuster
   }
 
   return (
-    <div className="result-panel" style={{ borderStyle: "solid" }}>
-      <p className="result-meta" style={{ marginBottom: 12 }}>
+    <div className="result-panel">
+      <p className="result-meta result-meta-spaced">
         Ajusta los 4 puntos a las esquinas del documento
       </p>
 
@@ -128,8 +128,8 @@ export function CornerAdjuster({ imageUrl, onConfirm, onCancel }: CornerAdjuster
           >
             <polygon
               points={cornerOrder.map((c) => `${corners[c].x},${corners[c].y}`).join(" ")}
-              fill="rgba(242,169,59,0.15)"
-              stroke="#f2a93b"
+              fill="rgba(109,40,217,0.18)"
+              stroke="#6D28D9"
               strokeWidth={2}
             />
           </svg>
@@ -145,17 +145,28 @@ export function CornerAdjuster({ imageUrl, onConfirm, onCancel }: CornerAdjuster
               }}
               style={{
                 position: "absolute",
-                left: corners[c].x - 14,
-                top: corners[c].y - 14,
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
-                background: "#f2a93b",
-                border: "2px solid #12263a",
+                left: corners[c].x - HANDLE_HIT / 2,
+                top: corners[c].y - HANDLE_HIT / 2,
+                width: HANDLE_HIT,
+                height: HANDLE_HIT,
+                display: "grid",
+                placeItems: "center",
                 cursor: "grab",
                 touchAction: "none",
               }}
-            />
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: HANDLE_DOT,
+                  height: HANDLE_DOT,
+                  borderRadius: "50%",
+                  background: "#6D28D9",
+                  border: "3px solid #fff",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
+                }}
+              />
+            </div>
           ))}
 
         {dragging && corners && displaySize.width > 0 && (
@@ -163,17 +174,21 @@ export function CornerAdjuster({ imageUrl, onConfirm, onCancel }: CornerAdjuster
         )}
       </div>
 
-      <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
+      <div className="actions">
         <button onClick={handleApply} disabled={isProcessing} className="btn btn-primary">
-          {isProcessing ? "procesando…" : "enderezar y agregar →"}
+          {isProcessing ? "Procesando…" : "Enderezar y agregar →"}
         </button>
-        <button onClick={onCancel} className="btn btn-success">
-          cancelar
+        <button onClick={onCancel} className="btn btn-secondary">
+          Cancelar
         </button>
       </div>
     </div>
   );
 }
+
+// Área táctil de 44px alrededor de un punto visible más pequeño
+const HANDLE_HIT = 44;
+const HANDLE_DOT = 24;
 
 const LOUPE_SIZE = 110;
 const LOUPE_ZOOM = 2.5;
@@ -203,7 +218,7 @@ function Magnifier({ point, imageUrl, displaySize }: MagnifierProps) {
         width: LOUPE_SIZE,
         height: LOUPE_SIZE,
         borderRadius: "50%",
-        border: "3px solid #f2a93b",
+        border: "3px solid #6D28D9",
         boxShadow: "0 4px 14px rgba(0,0,0,0.4)",
         overflow: "hidden",
         pointerEvents: "none",
@@ -220,7 +235,7 @@ function Magnifier({ point, imageUrl, displaySize }: MagnifierProps) {
           top: 0,
           bottom: 0,
           width: 1,
-          background: "rgba(242,169,59,0.9)",
+          background: "rgba(109,40,217,0.9)",
           transform: "translateX(-50%)",
         }}
       />
@@ -231,7 +246,7 @@ function Magnifier({ point, imageUrl, displaySize }: MagnifierProps) {
           left: 0,
           right: 0,
           height: 1,
-          background: "rgba(242,169,59,0.9)",
+          background: "rgba(109,40,217,0.9)",
           transform: "translateY(-50%)",
         }}
       />

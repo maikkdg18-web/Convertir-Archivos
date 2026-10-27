@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function AcercaDePage() {
   return (
     <main className="page">
-      <a href="/" className="back-link">← volver al set</a>
+      <a href="/" className="back-link">← Todas las herramientas</a>
 
       <div className="sheet-header">
         <div>
@@ -18,7 +18,7 @@ export default function AcercaDePage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gap: 20, maxWidth: 640 }}>
+      <div className="static-card">
         <p>
           <strong>Conversor de Archivos</strong> es una herramienta web gratuita para unir,
           comprimir y convertir PDFs e imágenes sin tener que instalar ningún programa.

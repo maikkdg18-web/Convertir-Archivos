@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
+import { toFriendlyError } from "@conversor/shared";
 import { FileDropzone } from "../../components/FileDropzone";
+import { Progress } from "../../components/Progress";
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
 
@@ -58,7 +60,17 @@ export default function ComprimirPdfPage() {
         { body: { fileUrls: [publicUrlData.publicUrl] } }
       );
 
-      if (fnError) throw new Error(fnError.message);
+      if (fnError) {
+        let functionMessage = fnError.message;
+        const responseContext = "context" in fnError ? fnError.context : null;
+
+        if (responseContext instanceof Response) {
+          const errorBody = (await responseContext.json().catch(() => null)) as { error?: string } | null;
+          if (errorBody?.error) functionMessage = errorBody.error;
+        }
+
+        throw new Error(functionMessage);
+      }
       if (!data?.success) throw new Error(data?.error ?? "Error al comprimir el PDF");
 
       setResult({
@@ -69,7 +81,7 @@ export default function ComprimirPdfPage() {
       });
       setStatus("done");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
+      setErrorMsg(toFriendlyError(err instanceof Error ? err.message : "Error desconocido"));
       setStatus("error");
     }
   }
@@ -97,69 +109,59 @@ export default function ComprimirPdfPage() {
   }
 
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: 600 }}>
-      <a href="/" style={{ color: "#2563eb" }}>
-        ← Volver
-      </a>
-      <h1>Comprimir PDF</h1>
-      <p>Sube un PDF y reducimos su peso optimizando su estructura interna.</p>
+    <main className="page">
+      <a href="/" className="back-link">← Todas las herramientas</a>
+
+      <div className="sheet-header">
+        <div>
+          <h1 className="sheet-title">Comprimir PDF</h1>
+          <p className="sheet-desc">Sube un PDF y reducimos su peso recomprimiendo su contenido.</p>
+        </div>
+      </div>
 
       <FileDropzone accept="application/pdf" multiple={false} onFilesSelected={handleFilesSelected} />
 
       {file && (
-        <p style={{ marginTop: "1rem" }}>
-          Archivo seleccionado: <strong>{file.name}</strong> ({formatBytes(file.size)})
-        </p>
+        <ul className="file-list">
+          <li className="file-row">
+            <span className="file-index">01</span>
+            <span className="file-name">{file.name}</span>
+            <span className="file-size">{formatBytes(file.size)}</span>
+          </li>
+        </ul>
       )}
 
-      <button
-        onClick={handleCompress}
-        disabled={status === "uploading" || status === "processing"}
-        style={{
-          marginTop: "1.5rem",
-          padding: "0.75rem 1.5rem",
-          backgroundColor: "#2563eb",
-          color: "white",
-          border: "none",
-          borderRadius: 6,
-          cursor: "pointer",
-          opacity: status === "uploading" || status === "processing" ? 0.6 : 1,
-        }}
-      >
-        {status === "uploading" && "Subiendo archivo..."}
-        {status === "processing" && "Comprimiendo..."}
-        {(status === "idle" || status === "done" || status === "error") && "Comprimir PDF"}
-      </button>
+      <div className="actions">
+        <button
+          onClick={handleCompress}
+          disabled={status === "uploading" || status === "processing"}
+          className="btn btn-primary"
+        >
+          {status === "uploading" && "Subiendo archivo…"}
+          {status === "processing" && "Comprimiendo…"}
+          {(status === "idle" || status === "done" || status === "error") && "Comprimir PDF →"}
+        </button>
+      </div>
 
-      {errorMsg && <p style={{ color: "red", marginTop: "1rem" }}>{errorMsg}</p>}
+      {status === "uploading" && <Progress label="Subiendo archivo…" />}
+      {status === "processing" && <Progress label="Comprimiendo…" />}
+
+      {errorMsg && <p className="error-text" role="alert">{errorMsg}</p>}
 
       {status === "done" && result && (
-        <div style={{ marginTop: "1.5rem", padding: "1rem", backgroundColor: "#f0fdf4", borderRadius: 8 }}>
-          <p style={{ margin: 0, marginBottom: 4 }}>✅ ¡Listo!</p>
-          <p style={{ margin: 0, marginBottom: 4, fontSize: 14, color: "#555" }}>
+        <div className="result-panel" role="status">
+          <span className="stamp">✓ Listo</span>
+          <p className="result-meta">
             {formatBytes(result.originalSize)} → {formatBytes(result.compressedSize)}
             {result.savedPercent > 0 && ` (−${result.savedPercent}%)`}
           </p>
           {result.savedPercent === 0 && (
-            <p style={{ margin: 0, marginBottom: 8, fontSize: 13, color: "#888" }}>
+            <p className="conversion-note result-note">
               Este PDF ya estaba bien optimizado, no hubo mucho que reducir.
             </p>
           )}
-          <button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            style={{
-              marginTop: 8,
-              padding: "0.5rem 1rem",
-              backgroundColor: "#16a34a",
-              color: "white",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer",
-              opacity: isDownloading ? 0.6 : 1,
-            }}
-          >
-            {isDownloading ? "Descargando..." : "Descargar PDF"}
+          <button onClick={handleDownload} disabled={isDownloading} className="btn btn-success">
+            {isDownloading ? "Descargando…" : "Descargar PDF"}
           </button>
         </div>
       )}
