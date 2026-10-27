@@ -7,13 +7,31 @@ type Theme = "light" | "dark";
 
 const STORAGE_KEY = "theme";
 
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+function isTheme(value: string | null | undefined): value is Theme {
+  return value === "light" || value === "dark";
+}
+
+// La elección se guarda en localStorage y, como respaldo, en una cookie de un año
 function readStoredTheme(): Theme | null {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored === "light" || stored === "dark" ? stored : null;
+    if (isTheme(stored)) return stored;
   } catch {
-    return null;
+    // localStorage bloqueado: se intenta con la cookie
   }
+  const match = document.cookie.match(/(?:^|; )theme=(light|dark)/);
+  return isTheme(match?.[1]) ? match[1] : null;
+}
+
+function storeTheme(theme: Theme) {
+  try {
+    localStorage.setItem(STORAGE_KEY, theme);
+  } catch {
+    // Sin localStorage: queda la cookie
+  }
+  document.cookie = `${STORAGE_KEY}=${theme}; max-age=${COOKIE_MAX_AGE}; path=/; SameSite=Lax`;
 }
 
 function applyTheme(theme: Theme) {
@@ -40,8 +58,19 @@ export function ThemeToggle() {
       setTheme(next);
     };
 
+    // Si se cambia el tema en otra pestaña, esta se actualiza
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== STORAGE_KEY || !isTheme(e.newValue)) return;
+      applyTheme(e.newValue);
+      setTheme(e.newValue);
+    };
+
     systemQuery.addEventListener("change", onSystemChange);
-    return () => systemQuery.removeEventListener("change", onSystemChange);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      systemQuery.removeEventListener("change", onSystemChange);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   function toggle() {
@@ -55,11 +84,7 @@ export function ThemeToggle() {
 
     applyTheme(next);
     setTheme(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      // Sin almacenamiento (modo privado): el cambio vale solo para esta visita
-    }
+    storeTheme(next);
   }
 
   return (

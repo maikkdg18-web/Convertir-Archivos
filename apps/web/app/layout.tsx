@@ -4,8 +4,9 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "../lib/site";
 import { ThemeToggle } from "../components/ThemeToggle";
 
-// Resuelve el tema antes del primer render (guardado o del sistema) para evitar el parpadeo
-const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`;
+// Resuelve el tema antes del primer render para evitar el parpadeo.
+// Orden: localStorage → cookie (respaldo si el navegador bloquea el almacenamiento) → preferencia del sistema.
+const THEME_SCRIPT = `(function(){try{var t=null;try{t=localStorage.getItem("theme")}catch(e){}if(t!=="light"&&t!=="dark"){var m=document.cookie.match(/(?:^|; )theme=(light|dark)/);t=m?m[1]:null}if(!t){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
