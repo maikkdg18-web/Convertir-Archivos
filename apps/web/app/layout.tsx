@@ -2,6 +2,10 @@ import "./globals.css";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "../lib/site";
+import { ThemeToggle } from "../components/ThemeToggle";
+
+// Resuelve el tema antes del primer render (guardado o del sistema) para evitar el parpadeo
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -48,8 +52,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4811758361067744"
@@ -71,7 +76,10 @@ export default function RootLayout({
               </span>
             </Link>
 
-            <span className="status-dot">listo para usar</span>
+            <div className="letterhead-actions">
+              <span className="status-dot">listo para usar</span>
+              <ThemeToggle />
+            </div>
           </div>
         </header>
 
