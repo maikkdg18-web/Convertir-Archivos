@@ -5,6 +5,7 @@ import { toFriendlyError } from "@conversor/shared";
 import { supabase } from "../lib/supabase";
 import { FileDropzone } from "./FileDropzone";
 import { Progress } from "./Progress";
+import { BackLink } from "./BackLink";
 
 interface SingleFileConverterProps {
   title: string;
@@ -124,7 +125,7 @@ export function SingleFileConverter({
 
   return (
     <main className="page">
-      <a href="/" className="back-link">← Todas las herramientas</a>
+      <BackLink />
       <div className="sheet-header">
         <div>
           <h1 className="sheet-title">{title}</h1>

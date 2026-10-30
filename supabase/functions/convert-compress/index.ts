@@ -12,6 +12,15 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// El nivel que elige la persona se traduce a un perfil de CloudConvert. Solo se
+// aceptan estos valores: lo que llegue de fuera nunca se pasa tal cual al servicio.
+const PROFILE_BY_LEVEL: Record<string, string> = {
+  light: "archive", // limpia y recomprime sin reducir la resolución de las imágenes
+  balanced: "web", // reduce resolución de imágenes y fusiona fuentes
+  max: "max", // máxima compresión; puede bajar la calidad visual
+};
+const DEFAULT_LEVEL = "balanced";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -20,7 +29,11 @@ serve(async (req) => {
       return jsonResponse({ success: false, error: "Falta configurar CLOUDCONVERT_API_KEY en Supabase." }, 500);
     }
 
-    const { fileUrls } = (await req.json()) as { fileUrls?: string[] };
+    const { fileUrls, fileName, level } = (await req.json()) as {
+      fileUrls?: string[];
+      fileName?: string;
+      level?: string;
+    };
     const fileUrl = fileUrls?.[0];
     if (!fileUrl) {
       return jsonResponse({ success: false, error: "Se necesita un PDF válido." }, 400);
@@ -28,7 +41,8 @@ serve(async (req) => {
 
     const originalSize = await getRemoteSize(fileUrl);
 
-    const job = await createJob(fileUrl);
+    const profile = PROFILE_BY_LEVEL[level && Object.hasOwn(PROFILE_BY_LEVEL, level) ? level : DEFAULT_LEVEL];
+    const job = await createJob(fileUrl, profile, toImportName(fileName));
     const finishedJob = await waitForJob(job.id);
     const exportFile = getExportFile(finishedJob);
 
@@ -51,7 +65,15 @@ serve(async (req) => {
   }
 });
 
-async function createJob(fileUrl: string) {
+// CloudConvert nombra la salida a partir de la entrada, así que se importa con el
+// nombre original del archivo para que el PDF comprimido conserve ese nombre.
+function toImportName(fileName?: string): string {
+  const base = (fileName ?? "").split(/[\\/]/).pop()?.trim() ?? "";
+  if (!base) return "documento.pdf";
+  return /\.pdf$/i.test(base) ? base : `${base}.pdf`;
+}
+
+async function createJob(fileUrl: string, profile: string, importName: string) {
   const response = await fetch(`${CLOUDCONVERT_API_URL}/jobs`, {
     method: "POST",
     headers: {
@@ -60,11 +82,12 @@ async function createJob(fileUrl: string) {
     },
     body: JSON.stringify({
       tasks: {
-        "import-file": { operation: "import/url", url: fileUrl, filename: "documento.pdf" },
+        "import-file": { operation: "import/url", url: fileUrl, filename: importName },
         "optimize-file": {
           operation: "optimize",
           input: "import-file",
           input_format: "pdf",
+          profile,
         },
         "export-file": { operation: "export/url", input: "optimize-file" },
       },

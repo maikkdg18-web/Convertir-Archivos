@@ -1,13 +1,9 @@
 import "./globals.css";
 import Link from "next/link";
-import Script from "next/script";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { SITE_NAME, SITE_URL } from "../lib/site";
-import { ThemeToggle } from "../components/ThemeToggle";
-
-// Resuelve el tema antes del primer render para evitar el parpadeo.
-// Orden: localStorage → cookie (respaldo si el navegador bloquea el almacenamiento) → preferencia del sistema.
-const THEME_SCRIPT = `(function(){try{var t=null;try{t=localStorage.getItem("theme")}catch(e){}if(t!=="light"&&t!=="dark"){var m=document.cookie.match(/(?:^|; )theme=(light|dark)/);t=m?m[1]:null}if(!t){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`;
+import { AdSenseLoader } from "../components/AdSenseLoader";
+import { NavTracker } from "../components/BackLink";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -48,26 +44,22 @@ export const metadata: Metadata = {
   },
 };
 
+// Sitio solo en modo oscuro: la barra del navegador móvil toma el mismo fondo.
+export const viewport: Viewport = {
+  themeColor: "#22262F",
+  colorScheme: "dark",
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-      </head>
-
+    <html lang="es">
       <body>
-        {/* AdSense inserta nodos en <head> al cargar; con un <script> estático ahí React falla
-            al hidratar y repinta el documento (se pierden data-theme y los eventos). */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4811758361067744"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        <NavTracker />
+        <AdSenseLoader />
         <header className="letterhead">
           <div className="letterhead-inner">
             <Link
@@ -82,8 +74,10 @@ export default function RootLayout({
             </Link>
 
             <div className="letterhead-actions">
+              <Link href="/guias" className="letterhead-link">
+                Guías
+              </Link>
               <span className="status-dot">listo para usar</span>
-              <ThemeToggle />
             </div>
           </div>
         </header>
@@ -96,6 +90,8 @@ export default function RootLayout({
               © {new Date().getFullYear()} {SITE_NAME}
             </span>
             <nav className="site-footer-links">
+              <Link href="/guias">Guías</Link>
+              <Link href="/preguntas">Preguntas</Link>
               <Link href="/acerca-de">Acerca de</Link>
               <Link href="/contacto">Contacto</Link>
               <Link href="/politica-de-privacidad">Privacidad</Link>

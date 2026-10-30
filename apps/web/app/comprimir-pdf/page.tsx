@@ -5,8 +5,11 @@ import { supabase } from "../../lib/supabase";
 import { toFriendlyError } from "@conversor/shared";
 import { FileDropzone } from "../../components/FileDropzone";
 import { Progress } from "../../components/Progress";
+import { BackLink } from "../../components/BackLink";
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
+
+type CompressionLevel = "light" | "balanced" | "max";
 
 interface CompressResult {
   outputUrl: string;
@@ -15,16 +18,55 @@ interface CompressResult {
   savedPercent: number;
 }
 
+// El ahorro es una estimación: depende de cuántas imágenes tenga el PDF (un PDF
+// solo de texto casi no se reduce).
+const LEVELS: {
+  id: CompressionLevel;
+  title: string;
+  description: string;
+  savings: string;
+}[] = [
+  {
+    id: "light",
+    title: "Ligera",
+    description: "Casi sin pérdida de calidad. Reduce menos el peso.",
+    savings: "10–25%",
+  },
+  {
+    id: "balanced",
+    title: "Equilibrada",
+    description: "Buena calidad y buen ahorro. Recomendada.",
+    savings: "30–60%",
+  },
+  {
+    id: "max",
+    title: "Máxima",
+    description: "El archivo más pequeño. Las imágenes pueden perder calidad.",
+    savings: "50–80%",
+  },
+];
+
 export default function ComprimirPdfPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [level, setLevel] = useState<CompressionLevel>("balanced");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [result, setResult] = useState<CompressResult | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
+  const isBusy = status === "uploading" || status === "processing";
+
   function handleFilesSelected(newFiles: File[]) {
     const pdf = newFiles.find((f) => f.type === "application/pdf");
     if (pdf) setFile(pdf);
+    setStatus("idle");
+    setResult(null);
+    setErrorMsg(null);
+  }
+
+  function handleLevelChange(next: CompressionLevel) {
+    setLevel(next);
+    // El resultado anterior ya no corresponde al nivel elegido
     setStatus("idle");
     setResult(null);
     setErrorMsg(null);
@@ -57,7 +99,7 @@ export default function ComprimirPdfPage() {
 
       const { data, error: fnError } = await supabase.functions.invoke(
         "convert-compress",
-        { body: { fileUrls: [publicUrlData.publicUrl] } }
+        { body: { fileUrls: [publicUrlData.publicUrl], fileName: file.name, level } }
       );
 
       if (fnError) {
@@ -87,16 +129,18 @@ export default function ComprimirPdfPage() {
   }
 
   async function handleDownload() {
-    if (!result) return;
+    if (!result || !file) return;
     setIsDownloading(true);
     try {
       const res = await fetch(result.outputUrl);
+      if (!res.ok) throw new Error("No se pudo descargar el archivo.");
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = blobUrl;
-      a.download = "documento-comprimido.pdf";
+      // Se conserva el nombre con el que se subió el archivo
+      a.download = file.name;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -110,12 +154,12 @@ export default function ComprimirPdfPage() {
 
   return (
     <main className="page">
-      <a href="/" className="back-link">← Todas las herramientas</a>
+      <BackLink />
 
       <div className="sheet-header">
         <div>
           <h1 className="sheet-title">Comprimir PDF</h1>
-          <p className="sheet-desc">Sube un PDF y reducimos su peso recomprimiendo su contenido.</p>
+          <p className="sheet-desc">Sube un PDF, elige cuánto quieres comprimirlo y reducimos su peso.</p>
         </div>
       </div>
 
@@ -131,10 +175,34 @@ export default function ComprimirPdfPage() {
         </ul>
       )}
 
+      <fieldset className="level-picker" disabled={isBusy}>
+        <legend>Nivel de compresión</legend>
+        <div className="level-options">
+          {LEVELS.map((option) => (
+            <label key={option.id} className="level-option">
+              <input
+                type="radio"
+                name="compression-level"
+                value={option.id}
+                checked={level === option.id}
+                onChange={() => handleLevelChange(option.id)}
+              />
+              <span className="level-title">{option.title}</span>
+              <span className="level-desc">{option.description}</span>
+              <span className="level-savings">Ahorro aprox. {option.savings}</span>
+            </label>
+          ))}
+        </div>
+        <p className="level-hint">
+          Los porcentajes son orientativos: dependen del contenido del PDF. Los que tienen muchas
+          imágenes o son escaneos se reducen más; los de solo texto, poco.
+        </p>
+      </fieldset>
+
       <div className="actions">
         <button
           onClick={handleCompress}
-          disabled={status === "uploading" || status === "processing"}
+          disabled={isBusy}
           className="btn btn-primary"
         >
           {status === "uploading" && "Subiendo archivo…"}
@@ -157,7 +225,9 @@ export default function ComprimirPdfPage() {
           </p>
           {result.savedPercent === 0 && (
             <p className="conversion-note result-note">
-              Este PDF ya estaba bien optimizado, no hubo mucho que reducir.
+              {level === "max"
+                ? "Este PDF ya estaba muy optimizado, no hubo mucho que reducir."
+                : "No hubo mucho que reducir con este nivel. Prueba con una compresión más alta."}
             </p>
           )}
           <button onClick={handleDownload} disabled={isDownloading} className="btn btn-success">
@@ -170,7 +240,7 @@ export default function ComprimirPdfPage() {
 }
 
 function sanitizeFileName(name: string): string {
-  const normalized = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const normalized = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
   return normalized.replace(/[^a-zA-Z0-9._-]/g, "-").replace(/-+/g, "-");
 }
 

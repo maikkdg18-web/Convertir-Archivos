@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ToolGuide } from "../../components/ToolGuide";
 
 export const metadata: Metadata = {
   title: "Unir PDFs gratis online",
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      {children}
+      <ToolGuide slug="unir-pdfs" />
+    </>
+  );
 }

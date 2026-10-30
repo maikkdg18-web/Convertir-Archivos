@@ -1,5 +1,8 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { FaqExplorer } from "../components/FaqExplorer";
+import { GUIDES } from "../lib/guides";
+import { FAQ_BANK } from "../lib/faq-bank";
 import { LightGrid } from "../components/LightGrid";
 import { Combine, Download, FileImage, FileText, FileType, Image as ImageIcon, Minimize2, ShieldCheck, Zap } from "lucide-react";
 
@@ -41,6 +44,23 @@ const TOOLS = [
     route: "/pdf-a-word",
   },
 ];
+
+const STEPS = [
+  {
+    title: "Elige la herramienta",
+    text: "Unir, comprimir o convertir: selecciona la acción que necesitas entre las seis disponibles.",
+  },
+  {
+    title: "Sube tu archivo",
+    text: "Arrástralo o pulsa para elegirlo. No hace falta crear una cuenta ni instalar nada.",
+  },
+  {
+    title: "Descarga el resultado",
+    text: "Cuando termina, descargas el archivo listo. Lo subido se borra automáticamente del servidor.",
+  },
+];
+
+const FEATURED_GUIDES = GUIDES.slice(0, 4);
 
 export default function HomePage() {
   return (
@@ -120,6 +140,70 @@ export default function HomePage() {
           <div className="benefit-item"><span aria-hidden="true"><Zap size={18} /></span><div><strong>Flujo sencillo</strong><p>Sube tus archivos y descarga el resultado.</p></div></div>
           <div className="benefit-item"><span aria-hidden="true"><ShieldCheck size={18} /></span><div><strong>Resultados limpios</strong><p>Tus documentos salen sin marcas de agua.</p></div></div>
         </div>
+      </section>
+
+      <section className="landing-section" aria-labelledby="como-funciona">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Cómo funciona</span>
+            <h2 id="como-funciona">Tres pasos, sin complicaciones.</h2>
+          </div>
+          <p>
+            Cada herramienta sigue el mismo flujo, así que aprendes una vez y sirve para todas.
+            Los archivos se usan solo para generar tu resultado y se eliminan después.
+          </p>
+        </div>
+
+        <ol className="steps-grid">
+          {STEPS.map((step, index) => (
+            <li key={step.title} className="step-card">
+              <span className="step-number">0{index + 1}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="landing-section" aria-labelledby="guias-destacadas">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Guías</span>
+            <h2 id="guias-destacadas">Aprende a sacarles partido a tus documentos.</h2>
+          </div>
+          <Link href="/guias" className="section-link">
+            Ver todas las guías <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+
+        <ul className="guide-list guide-list-wide">
+          {FEATURED_GUIDES.map((guide) => (
+            <li key={guide.slug}>
+              <Link href={`/guias/${guide.slug}`} className="guide-card">
+                <span className="guide-card-title">{guide.title}</span>
+                <span className="guide-card-desc">{guide.description}</span>
+                <span className="guide-card-action">
+                  Leer guía <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="landing-section" aria-labelledby="preguntas-frecuentes">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Preguntas frecuentes</span>
+            <h2 id="preguntas-frecuentes">Lo que suele preguntarse.</h2>
+          </div>
+          <p>
+            Un grupo distinto de preguntas en cada visita. Si buscas algo concreto, escribe una
+            palabra clave y las encontramos todas.
+          </p>
+        </div>
+
+        <FaqExplorer items={FAQ_BANK} limit={6} rotate showAllLink />
       </section>
     </main>
   );

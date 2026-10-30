@@ -6,6 +6,7 @@ import { supabase } from "../../lib/supabase";
 import { toFriendlyError } from "@conversor/shared";
 import { FileDropzone } from "../../components/FileDropzone";
 import { Progress } from "../../components/Progress";
+import { BackLink } from "../../components/BackLink";
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
 
@@ -95,7 +96,7 @@ export default function PdfAImagenesPage() {
 
   return (
     <main className="page">
-      <a href="/" className="back-link">← Todas las herramientas</a>
+      <BackLink />
 
       <div className="sheet-header">
         <div>
